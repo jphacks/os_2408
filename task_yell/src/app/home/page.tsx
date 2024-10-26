@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DateTimeInput } from "@/components/ui/date-time-input";
+import { DateTimeInput } from "@/components/date-time-input";
 import {
   Dialog,
   DialogContent,
