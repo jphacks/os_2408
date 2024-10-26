@@ -1,9 +1,9 @@
 "use client";
 
+import { DateTimeInput } from "@/components/date-time-input";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DateTimeInput } from "@/components/date-time-input";
 import {
   Dialog,
   DialogContent,
@@ -33,7 +33,12 @@ import {
 } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { AngleIcon, ListBulletIcon, Pencil1Icon, ViewGridIcon } from "@radix-ui/react-icons";
+import {
+  AngleIcon,
+  ListBulletIcon,
+  Pencil1Icon,
+  ViewGridIcon,
+} from "@radix-ui/react-icons";
 import {
   addMonths,
   eachDayOfInterval,
@@ -255,6 +260,7 @@ function EventCreator({
         <div className="flex flex-row gap-2">
           <ListBulletIcon className="w-6 h-6" />
           <Textarea
+            className="h-32"
             placeholder="説明を追加"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
