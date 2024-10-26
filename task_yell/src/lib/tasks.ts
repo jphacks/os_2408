@@ -33,7 +33,10 @@ export async function readTasks(userId: string): Promise<Task[]> {
  * @param id - 取得するタスクのID。
  * @returns 指定されたIDのタスク。
  */
-export async function readSingleTask(userId: string, id: string): Promise<Task | null> {
+export async function readSingleTask(
+  userId: string,
+  id: string,
+): Promise<Task | null> {
   return readSingleData<Task>(`users/${userId}/${COLLECTION_NAME}`, id);
 }
 

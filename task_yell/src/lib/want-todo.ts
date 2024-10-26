@@ -13,7 +13,10 @@ const COLLECTION_NAME = "want-todos";
  *
  * @param wantTodo - 作成する `WantTodo` オブジェクト。
  */
-export async function createWantTodo(userId: string, wantTodo: WantTodo): Promise<void> {
+export async function createWantTodo(
+  userId: string,
+  wantTodo: WantTodo,
+): Promise<void> {
   await createData<WantTodo>(`users/${userId}/${COLLECTION_NAME}`, wantTodo);
 }
 
@@ -32,7 +35,10 @@ export async function readWantTodos(userId: string): Promise<WantTodo[]> {
  * @param id - 取得するイベントのID。
  * @returns 指定されたIDのWantTodo。
  */
-export async function readSingleWantTodo(userId: string, id: string): Promise<WantTodo | null> {
+export async function readSingleWantTodo(
+  userId: string,
+  id: string,
+): Promise<WantTodo | null> {
   return readSingleData<WantTodo>(`users/${userId}/${COLLECTION_NAME}`, id);
 }
 
@@ -47,7 +53,11 @@ export async function updateWantTodo(
   id: string,
   wantTodoData: Partial<WantTodo>,
 ): Promise<void> {
-  return updateData<WantTodo>(`users/${userId}/${COLLECTION_NAME}`, id, wantTodoData);
+  return updateData<WantTodo>(
+    `users/${userId}/${COLLECTION_NAME}`,
+    id,
+    wantTodoData,
+  );
 }
 
 /**
@@ -55,6 +65,9 @@ export async function updateWantTodo(
  *
  * @param id - 削除するWantTodoのID。
  */
-export async function deleteWantTodo(userId: string, id: string): Promise<void> {
+export async function deleteWantTodo(
+  userId: string,
+  id: string,
+): Promise<void> {
   return deleteData(`users/${userId}/${COLLECTION_NAME}`, id);
 }

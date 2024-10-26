@@ -14,7 +14,10 @@ const COLLECTION_NAME = "events";
  * @param event 作成されるイベント
  * @returns 競合がない場合はnull, そうでない場合はマージエディターで必要なので該当日時のイベントのリスト
  */
-export async function createEvent(userId: string, event: Event): Promise<Event[] | null> {
+export async function createEvent(
+  userId: string,
+  event: Event,
+): Promise<Event[] | null> {
   // event.start ~ event.end とコンフリクトする予定があるかどうかを確認する
   const events = await readEvents(userId);
   const isConflict = events.some(
@@ -32,7 +35,10 @@ export async function readEvents(userId: string): Promise<Event[]> {
   return readData<Event>(`users/${userId}/${COLLECTION_NAME}`);
 }
 
-export async function readSingleEvent(userId: string, id: string): Promise<Event | null> {
+export async function readSingleEvent(
+  userId: string,
+  id: string,
+): Promise<Event | null> {
   return readSingleData<Event>(`users/${userId}/${COLLECTION_NAME}`, id);
 }
 
