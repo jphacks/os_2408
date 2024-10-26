@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import { motion } from 'framer-motion'
-import { Button } from "@/components/ui/button"
-import { Chrome } from 'lucide-react'
-import { useCallback } from 'react';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
-import { auth } from '@/firebase/client-app';
-import { useRouter } from 'next/navigation';
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { Chrome } from "lucide-react";
+import { useCallback } from "react";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "@/firebase/client-app";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -27,7 +27,9 @@ export default function SignUpPage() {
         className="w-full max-w-md"
       >
         <div className="bg-white shadow-xl rounded-lg p-8 space-y-6">
-          <h1 className="text-3xl font-bold text-center text-primary">サインイン</h1>
+          <h1 className="text-3xl font-bold text-center text-primary">
+            サインイン
+          </h1>
           <p className="text-center text-gray-600">
             Googleアカウントを使用して簡単にサインインできます。
           </p>
@@ -42,5 +44,5 @@ export default function SignUpPage() {
         </div>
       </motion.div>
     </div>
-  )
+  );
 }

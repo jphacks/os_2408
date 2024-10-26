@@ -9,12 +9,11 @@ export default function Home() {
   const router = useRouter();
   useEffect(() => {
     // サインインしていない場合、サインインページにリダイレクト
-    auth.authStateReady()
-      .then(() => {
-        if (!auth.currentUser) {
-          router.push("/signin");
-        }
-      });
+    auth.authStateReady().then(() => {
+      if (!auth.currentUser) {
+        router.push("/signin");
+      }
+    });
   }, [router]);
 
   return (
