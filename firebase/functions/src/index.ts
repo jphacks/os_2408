@@ -1,17 +1,9 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
-
 import { onRequest } from "firebase-functions/v2/https";
 import * as functions from "firebase-functions/v2";
 import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
-import type { DocumentReference } from "firebase-admin/firestore";
+import { DocumentReference } from "firebase-admin/firestore";
+
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
 
@@ -22,23 +14,39 @@ export const helloWorld = onRequest((request, response) => {
   response.send("Hello from Firebase!");
 });
 
+// タイムゾーンは日本時間
 export const pushNotification = functions.scheduler
-  .onSchedule("every 1 minutes", async () => {
+  .onSchedule({
+    schedule: "every 1 minutes", timeZone: "Asia/Tokyo"
+  }, async () => {
     const now = (() => {
       let s = admin.firestore.Timestamp.now().seconds
       s = s - s % 60
       return new admin.firestore.Timestamp(s, 0)
     })()
+    const next = (() => {
+      const s = now.seconds + 60;
+      return new admin.firestore.Timestamp(s, 0);
+    })();
+    console.log(`now: ${now.toDate()}`)
     // リマインダーコレクションから現在時刻のリマインダーをクエリ
     const db = admin.firestore()
     const notifications = await Promise.all((await db.collection('notifications')
-      .where('datetime', '==', now)
+      .where('datetime', '<', next)
+      .where('datetime', '>=', now)
       .where("type", "==", "push")
       .get())
       .docs
       .map(async doc => {
-        const event = await (doc.get("eventOrTaskRef") as DocumentReference).get();
-        const tokens = await db.collection("users").doc(doc.get("userId")).get().then(doc => doc.get("fcm-tokens")) as string[];
+        const eventRef = (await doc.get("eventOrTaskRef")) as DocumentReference;
+        console.log(`eventRef: ${eventRef.path}`)
+        console.log(`userId: ${doc.get("userId")}`)
+        const event = await eventRef.get();
+        console.log(`event: ${event.data()}`)
+        const tokens = await db.collection("users")
+          .doc(doc.get("userId"))
+          .get().then(doc => doc.get("fcm-tokens")) as string[];
+
         return {
           title: event.get("title"),
           description: event.get("description"),
@@ -46,14 +54,15 @@ export const pushNotification = functions.scheduler
         }
       }));
 
-      const messaging = admin.messaging();
-      for (const notification of notifications) {
-        await messaging.sendEachForMulticast({
-          tokens: notification.tokens,
-          notification: {
-            title: notification.title,
-            body: notification.description
-          }
-        })
-      }
+    const messaging = admin.messaging();
+    for (const notification of notifications) {
+      console.log(`notification: ${notification}`)
+      await messaging.sendEachForMulticast({
+        tokens: notification.tokens,
+        notification: {
+          title: notification.title,
+          body: notification.description
+        }
+      })
+    }
   });
