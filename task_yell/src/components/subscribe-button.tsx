@@ -1,8 +1,7 @@
 "use client";
 
-import { auth, db, firebaseApp } from "@/firebase/client-app";
+import { auth, firebaseApp } from "@/firebase/client-app";
 import { createData, readSingleData, updateData } from "@/firebase/firestore";
-import { getFirestore } from "firebase/firestore";
 import { getMessaging, getToken } from "firebase/messaging";
 import { useCallback, useState, useTransition } from "react";
 
@@ -60,7 +59,7 @@ export function SubscribeButton() {
         tokens.push(token);
         if (user) {
           await updateData("users", auth.currentUser.uid, {
-            "fcm-tokens": tokens
+            "fcm-tokens": tokens,
           });
         } else {
           await createData("users", {
