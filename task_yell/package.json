@@ -10,6 +10,12 @@
     "format": "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,json}'",
     "format:check": "prettier --check --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,json}'"
   },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json}": [
+      "next lint --fix",
+      "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,json}'"
+    ]
+  },
   "dependencies": {
     "firebase": "^11.0.1",
     "firebase-admin": "^12.7.0",
