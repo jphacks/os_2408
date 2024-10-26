@@ -51,7 +51,7 @@ describe("Task CRUD operations", () => {
     await createTask(mockUserId, mockTask);
     expect(createData).toHaveBeenCalledWith(
       `users/${mockUserId}/tasks`,
-      mockTask
+      mockTask,
     );
   });
 
@@ -70,7 +70,7 @@ describe("Task CRUD operations", () => {
     expect(task).toEqual(mockTask);
     expect(readSingleData).toHaveBeenCalledWith(
       `users/${mockUserId}/tasks`,
-      "mockTaskId"
+      "mockTaskId",
     );
   });
 
@@ -83,7 +83,7 @@ describe("Task CRUD operations", () => {
       "mockTaskId",
       {
         title: "Updated Task",
-      }
+      },
     );
   });
 
@@ -93,7 +93,7 @@ describe("Task CRUD operations", () => {
     await deleteTask(mockUserId, "mockTaskId");
     expect(deleteData).toHaveBeenCalledWith(
       `users/${mockUserId}/tasks`,
-      "mockTaskId"
+      "mockTaskId",
     );
   });
 });
