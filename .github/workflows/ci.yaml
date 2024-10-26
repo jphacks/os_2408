@@ -22,7 +22,10 @@ jobs:
           check-latest: true
 
       - name: Mv directory
-        run: cd ./task_yell
+        run: |
+          tree
+          cd ./task_yell
+          tree
 
       - name: Install dependencies
         run: npm install
@@ -86,10 +89,7 @@ jobs:
         run: npm install --global vercel@latest
 
       - name: Mv directory
-        run: |
-          tree
-          cd ./task_yell
-          tree
+        run: cd ./task_yell
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
