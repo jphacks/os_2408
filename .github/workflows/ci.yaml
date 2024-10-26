@@ -40,17 +40,17 @@ jobs:
     environment:
       name: preview
       url: ${{ steps.deploy.outputs.url }}
+    defaults:
+      run:
+        working-directory: task_yell
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup node
         uses: actions/setup-node@v3
         with:
           node-version: 18
           check-latest: true
-
-      - name: Mv directory
-        run: cd ./task_yell
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
@@ -73,8 +73,11 @@ jobs:
     needs: lint
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: task_yell
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup node
         uses: actions/setup-node@v3
@@ -84,9 +87,6 @@ jobs:
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
-
-      - name: Mv directory
-        run: cd ./task_yell
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
