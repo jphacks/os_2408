@@ -6,10 +6,10 @@ export interface Event {
   title: string;
   description: string;
   attendees: string[];
-  start: Date;
-  end: Date;
+  start: Date | null;
+  end: Date | null;
   importance: "high" | "medium" | "low";
-  location: FirebaseFirestore.GeoPoint;
+  location: FirebaseFirestore.GeoPoint | null;
   reccurence: string[];
 }
 
