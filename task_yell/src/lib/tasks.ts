@@ -14,8 +14,8 @@ const COLLECTION_NAME = "tasks";
  *
  * @param task 作成されるタスク
  */
-export async function createTask(task: Task): Promise<void> {
-  await createData(COLLECTION_NAME, task);
+export async function createTask(userId: string, task: Task): Promise<void> {
+  await createData(`users/${userId}/${COLLECTION_NAME}`, task);
 }
 
 /**
@@ -23,8 +23,8 @@ export async function createTask(task: Task): Promise<void> {
  *
  * @returns 全タスク
  */
-export async function readTasks(): Promise<Task[]> {
-  return readData<Task>(COLLECTION_NAME);
+export async function readTasks(userId: string): Promise<Task[]> {
+  return readData<Task>(`users/${userId}/${COLLECTION_NAME}`);
 }
 
 /**
@@ -33,8 +33,11 @@ export async function readTasks(): Promise<Task[]> {
  * @param id - 取得するタスクのID。
  * @returns 指定されたIDのタスク。
  */
-export async function readSingleTask(id: string): Promise<Task | null> {
-  return readSingleData<Task>(COLLECTION_NAME, id);
+export async function readSingleTask(
+  userId: string,
+  id: string,
+): Promise<Task | null> {
+  return readSingleData<Task>(`users/${userId}/${COLLECTION_NAME}`, id);
 }
 
 /**
@@ -44,10 +47,11 @@ export async function readSingleTask(id: string): Promise<Task | null> {
  * @param taskData 新規タスクデータ
  */
 export async function updateTask(
+  userId: string,
   id: string,
   taskData: Partial<Task>,
 ): Promise<void> {
-  await updateData<Task>(COLLECTION_NAME, id, taskData);
+  await updateData<Task>(`users/${userId}/${COLLECTION_NAME}`, id, taskData);
 }
 
 /**
@@ -55,6 +59,6 @@ export async function updateTask(
  *
  * @param id 削除するタスクのID。
  */
-export async function deleteTask(id: string): Promise<void> {
-  await deleteData(COLLECTION_NAME, id);
+export async function deleteTask(userId: string, id: string): Promise<void> {
+  await deleteData(`users/${userId}/${COLLECTION_NAME}`, id);
 }

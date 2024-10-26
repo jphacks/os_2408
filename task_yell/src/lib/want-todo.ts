@@ -13,8 +13,11 @@ const COLLECTION_NAME = "want-todos";
  *
  * @param wantTodo - 作成する `WantTodo` オブジェクト。
  */
-export async function createWantTodo(wantTodo: WantTodo): Promise<void> {
-  await createData<WantTodo>(COLLECTION_NAME, wantTodo);
+export async function createWantTodo(
+  userId: string,
+  wantTodo: WantTodo,
+): Promise<void> {
+  await createData<WantTodo>(`users/${userId}/${COLLECTION_NAME}`, wantTodo);
 }
 
 /**
@@ -22,8 +25,8 @@ export async function createWantTodo(wantTodo: WantTodo): Promise<void> {
  *
  * @returns 全WantTodo
  */
-export async function readWantTodos(): Promise<WantTodo[]> {
-  return readData<WantTodo>(COLLECTION_NAME);
+export async function readWantTodos(userId: string): Promise<WantTodo[]> {
+  return readData<WantTodo>(`users/${userId}/${COLLECTION_NAME}`);
 }
 
 /**
@@ -32,8 +35,11 @@ export async function readWantTodos(): Promise<WantTodo[]> {
  * @param id - 取得するイベントのID。
  * @returns 指定されたIDのWantTodo。
  */
-export async function readSingleWantTodo(id: string): Promise<WantTodo | null> {
-  return readSingleData<WantTodo>(COLLECTION_NAME, id);
+export async function readSingleWantTodo(
+  userId: string,
+  id: string,
+): Promise<WantTodo | null> {
+  return readSingleData<WantTodo>(`users/${userId}/${COLLECTION_NAME}`, id);
 }
 
 /**
@@ -43,10 +49,15 @@ export async function readSingleWantTodo(id: string): Promise<WantTodo | null> {
  * @param wantTodoData 新規WantTodoデータ。
  */
 export async function updateWantTodo(
+  userId: string,
   id: string,
   wantTodoData: Partial<WantTodo>,
 ): Promise<void> {
-  return updateData<WantTodo>(COLLECTION_NAME, id, wantTodoData);
+  return updateData<WantTodo>(
+    `users/${userId}/${COLLECTION_NAME}`,
+    id,
+    wantTodoData,
+  );
 }
 
 /**
@@ -54,6 +65,9 @@ export async function updateWantTodo(
  *
  * @param id - 削除するWantTodoのID。
  */
-export async function deleteWantTodo(id: string): Promise<void> {
-  return deleteData(COLLECTION_NAME, id);
+export async function deleteWantTodo(
+  userId: string,
+  id: string,
+): Promise<void> {
+  return deleteData(`users/${userId}/${COLLECTION_NAME}`, id);
 }
