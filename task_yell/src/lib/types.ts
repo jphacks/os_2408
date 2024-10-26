@@ -7,10 +7,11 @@ export interface Event {
   importance: "high" | "medium" | "low";
   location: FirebaseFirestore.GeoPoint;
   reccurence: string[];
-  notifications: Notification[];
 }
 
 export interface Notification {
   datetime: Date;
   type: "call" | "push";
+  eventOrTaskRef: string;
+  userId: string;
 }
