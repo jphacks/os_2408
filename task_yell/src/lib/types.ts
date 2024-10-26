@@ -1,3 +1,7 @@
+export interface WantTodo {
+  title: string;
+}
+
 export interface Event {
   title: string;
   description: string;
@@ -6,6 +10,14 @@ export interface Event {
   end: Date;
   importance: "high" | "medium" | "low";
   location: FirebaseFirestore.GeoPoint;
+  reccurence: string[];
+}
+
+export interface Task {
+  title: string;
+  description: string;
+  due: Date;
+  importance: "high" | "medium" | "low";
   reccurence: string[];
 }
 
