@@ -72,6 +72,7 @@ export const callNotification = functions.scheduler
     const notifications = await getNotifications("call");
 
     const client = require("twilio")(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+    console.log(`notifications: ${notifications}`);
     for (const notification of notifications) {
       console.log(`notification: ${notification}`);
       // 電話番号を取得
@@ -85,7 +86,7 @@ export const callNotification = functions.scheduler
       if (phoneNumber) {
         // 電話をかける
         await client.calls.create({
-          body: `これは ${notification.title} の通知です。`,
+          twiml: `<Response><Say language="ja-JP">これは ${notification.title} の通知です。</Say></Response>`,
           to: phoneNumber,
           from: process.env.TWILIO_FROM,
         });
