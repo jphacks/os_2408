@@ -23,7 +23,13 @@ export async function createEvent(
   let isConflict = false;
   if (event.start && event.end) {
     isConflict = events.some(
-      (e) => e.start && event.start && e.end && event.end && event.start <= e.end && event.end >= e.start,
+      (e) =>
+        e.start &&
+        event.start &&
+        e.end &&
+        event.end &&
+        event.start <= e.end &&
+        event.end >= e.start,
     );
   }
   if (isConflict) {
