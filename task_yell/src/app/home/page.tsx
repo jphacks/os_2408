@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
+import { DateTimeInput } from "@/components/ui/date-time-input";
 import {
   Dialog,
   DialogContent,
@@ -32,6 +33,7 @@ import {
 } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { AngleIcon, ListBulletIcon, Pencil1Icon, ViewGridIcon } from "@radix-ui/react-icons";
 import {
   addMonths,
   eachDayOfInterval,
@@ -48,7 +50,6 @@ import {
 import { ja } from "date-fns/locale";
 import { AnimatePresence, motion, useDragControls } from "framer-motion";
 import {
-  CalendarIcon,
   ChevronLeft,
   ChevronRight,
   ChevronUp,
@@ -175,35 +176,15 @@ function EventCreator({
 }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [startTime, setStartTime] = useState("10:00");
-  const [endTime, setEndTime] = useState("11:00");
+  const [date] = useState<Date | undefined>(new Date());
+  const [startTime] = useState("10:00");
+  const [endTime] = useState("11:00");
   const [location, setLocation] = useState("");
   const [invitees, setInvitees] = useState("");
   const [category, setCategory] = useState<Category>("other");
   const [priority, setPriority] = useState<Priority>("medium");
   const [isTask, setIsTask] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
-
-  const timeOptions = Array.from({ length: 96 }, (_, i) => {
-    const hours = Math.floor(i / 4)
-      .toString()
-      .padStart(2, "0");
-    const minutes = ((i % 4) * 15).toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
-  });
-
-  const handleTimeChange = (time: string, isStart: boolean) => {
-    if (isStart) {
-      setStartTime(time);
-      // 終了時間を自動的に1時間後に設定
-      const [hours, minutes] = time.split(":").map(Number);
-      const endDate = new Date(2000, 0, 1, hours + 1, minutes);
-      setEndTime(format(endDate, "HH:mm"));
-    } else {
-      setEndTime(time);
-    }
-  };
 
   const handleSave = () => {
     if (date) {
@@ -245,7 +226,7 @@ function EventCreator({
         </div>
       </div>
       <div className="w-3/5 space-y-3">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           <Checkbox
             id="is-task"
             checked={isTask}
@@ -253,135 +234,91 @@ function EventCreator({
           />
           <Label htmlFor="is-task">タスクにする</Label>
         </div>
+        <div className="flex flex-row items-center gap-2">
+          <Pencil1Icon className="w-6 h-6" />
+          <Input
+            placeholder="タイトルを追加"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
 
-        <Input
-          placeholder="タイトルを追加"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-
-        {!isTask && (
-          <>
-            <div className="flex items-center space-x-2">
-              <CalendarIcon className="text-gray-500" />
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline">
-                    {date
-                      ? format(date, "yyyy年MM月dd日 (E)", { locale: ja })
-                      : "日付を選択"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Select
-                value={startTime}
-                onValueChange={(value) => handleTimeChange(value, true)}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="開始時間" />
-                </SelectTrigger>
-                <SelectContent>
-                  {timeOptions.map((time) => (
-                    <SelectItem key={time} value={time}>
-                      {time}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <span>-</span>
-              <Select
-                value={endTime}
-                onValueChange={(value) => handleTimeChange(value, false)}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="終了時間" />
-                </SelectTrigger>
-                <SelectContent>
-                  {timeOptions.map((time) => (
-                    <SelectItem key={time} value={time}>
-                      {time}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Textarea
-              placeholder="説明を追加"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-
-            <div className="flex items-center space-x-2">
-              <UserPlusIcon className="text-gray-500" />
-              <Input
-                placeholder="招待"
-                value={invitees}
-                onChange={(e) => setInvitees(e.target.value)}
-              />
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <MapPinIcon className="text-gray-500" />
-              <Input
-                placeholder="場所または会議URLを追加"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-              />
-            </div>
-
-            <Select
-              value={category}
-              onValueChange={(value: Category) => setCategory(value)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="カテゴリを選択" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="work">仕事</SelectItem>
-                <SelectItem value="personal">個人</SelectItem>
-                <SelectItem value="shopping">買い物</SelectItem>
-                <SelectItem value="health">健康</SelectItem>
-                <SelectItem value="other">その他</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select
-              value={priority}
-              onValueChange={(value: Priority) => setPriority(value)}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="重要度を選択" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="low">低</SelectItem>
-                <SelectItem value="medium">中</SelectItem>
-                <SelectItem value="high">高</SelectItem>
-              </SelectContent>
-            </Select>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="is-locked"
-                checked={isLocked}
-                onCheckedChange={(checked) => setIsLocked(checked as boolean)}
-              />
-              <Label htmlFor="is-locked">ロックする</Label>
-            </div>
-          </>
+        {isTask ? (
+          <DateTimeInput className="w-full" />
+        ) : (
+          <div className="flex flex-col gap-2">
+            <DateTimeInput className="w-full" />
+            <DateTimeInput className="w-full" />
+          </div>
         )}
 
-        <div className="flex justify-end space-x-2">
+        <div className="flex flex-row gap-2">
+          <ListBulletIcon className="w-6 h-6" />
+          <Textarea
+            placeholder="説明を追加"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <UserPlusIcon className="text-gray-500 h-6 w-6" />
+          <Input
+            placeholder="招待"
+            value={invitees}
+            onChange={(e) => setInvitees(e.target.value)}
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <MapPinIcon className="text-gray-500 h-6 w-6" />
+          <Input
+            placeholder="場所または会議URLを追加"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+          />
+        </div>
+        <div className="flex flex-row gap-2 items-center">
+          <ViewGridIcon className="w-6 h-6" />
+          <Select
+            value={category}
+            onValueChange={(value: Category) => setCategory(value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="カテゴリを選択" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="work">仕事</SelectItem>
+              <SelectItem value="personal">個人</SelectItem>
+              <SelectItem value="shopping">買い物</SelectItem>
+              <SelectItem value="health">健康</SelectItem>
+              <SelectItem value="other">その他</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex flex-row gap-2 items-center">
+          <AngleIcon className="w-6 h-6" />
+          <Select
+            value={priority}
+            onValueChange={(value: Priority) => setPriority(value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="重要度を選択" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="low">低</SelectItem>
+              <SelectItem value="medium">中</SelectItem>
+              <SelectItem value="high">高</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="is-locked"
+            checked={isLocked}
+            onCheckedChange={(checked) => setIsLocked(checked as boolean)}
+          />
+          <Label htmlFor="is-locked">ロックする</Label>
+        </div>
+        <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={onCancel}>
             キャンセル
           </Button>
@@ -642,7 +579,7 @@ export default function Page() {
       >
         {todo.text}
       </label>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-2">
         {categoryIcons[todo.category]}
         <span className="text-sm text-gray-500 dark:text-gray-400">
           {format(todo.date, "yyyy/MM/dd", { locale: ja })}
@@ -672,7 +609,7 @@ export default function Page() {
             <p className="text-sm text-gray-600 dark:text-gray-400">
               {event.description}
             </p>
-            <div className="flex items-center space-x-2 mt-1">
+            <div className="flex items-center gap-2 mt-1">
               {categoryIcons[event.category]}
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 {format(event.start, "yyyy/MM/dd HH:mm", { locale: ja })} -{" "}
@@ -750,7 +687,7 @@ export default function Page() {
             <SheetTitle>設定</SheetTitle>
           </SheetHeader>
           <div className="mt-4 space-y-4">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <Switch
                 id="dark-mode"
                 checked={isDarkMode}
@@ -790,7 +727,7 @@ export default function Page() {
           <h2 className="text-xl lg:text-2xl font-bold mb-4 dark:text-white">
             TODO リスト
           </h2>
-          <div className="flex flex-col lg:flex-row mb-4 space-y-2 lg:space-y-0 lg:space-x-2">
+          <div className="flex flex-col lg:flex-row mb-4 space-y-2 lg:space-y-0 lg:gap-2">
             <Input
               type="text"
               value={newTodo}
@@ -997,7 +934,7 @@ export default function Page() {
                     placeholder="新しいタスクを入力"
                     className="w-full"
                   />
-                  <div className="flex space-x-2">
+                  <div className="flex gap-2">
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button variant="outline" className="w-1/2">
