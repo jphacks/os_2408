@@ -86,7 +86,10 @@ jobs:
         run: npm install --global vercel@latest
 
       - name: Mv directory
-        run: cd ./task_yell
+        run: |
+          tree
+          cd ./task_yell
+          tree
 
       - name: Pull Vercel Environment Information
         run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
