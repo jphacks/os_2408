@@ -9,7 +9,29 @@ env:
 on: push
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          check-latest: true
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run Prettier
+        run: npm run format:check
+
   preview:
+    needs: lint
     if: ${{ github.ref != 'refs/heads/main' }}
     runs-on: ubuntu-latest
     environment:
@@ -45,6 +67,7 @@ jobs:
         run: vercel alias ${{ steps.deploy.outputs.url }} stg.my-service.com --scope=my-team --token=${{ secrets.VERCEL_TOKEN }}
 
   prod:
+    needs: lint
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
