@@ -20,9 +20,18 @@ export async function createEvent(
 ): Promise<Event[] | null> {
   // event.start ~ event.end とコンフリクトする予定があるかどうかを確認する
   const events = await readEvents(userId);
-  const isConflict = events.some(
-    (e) => event.start <= e.end && event.end >= e.start,
-  );
+  let isConflict = false;
+  if (event.start && event.end) {
+    isConflict = events.some(
+      (e) =>
+        e.start &&
+        event.start &&
+        e.end &&
+        event.end &&
+        event.start <= e.end &&
+        event.end >= e.start,
+    );
+  }
   if (isConflict) {
     return events;
   } else {
