@@ -14,7 +14,7 @@ const COLLECTION_NAME = "tasks";
  *
  * @param task 作成されるタスク
  */
-export async function createEvent(task: Task): Promise<void> {
+export async function createTask(task: Task): Promise<void> {
   await createData(COLLECTION_NAME, task);
 }
 
