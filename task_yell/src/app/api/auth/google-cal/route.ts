@@ -1,6 +1,6 @@
-import { google } from 'googleapis';
+import { google } from "googleapis";
 import { redirect } from "next/navigation";
-import { NextRequest } from 'next/server';
+import { NextRequest } from "next/server";
 
 // Google 認証後、ユーザーに許可を得る認可スコープ
 // この場合は、DriveへのRead権限の認可
@@ -12,7 +12,8 @@ function createOAuth2Client() {
     process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
     process.env.NODE_ENV === "development"
       ? "https://localhost:3000/api/auth/google-cal/callback"
-      : "https://taskyell.vercel.app/api/auth/google-cal/callback");
+      : "https://taskyell.vercel.app/api/auth/google-cal/callback",
+  );
 }
 
 // urlパラメータにユーザーIDを持たせる

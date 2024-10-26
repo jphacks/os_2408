@@ -1,7 +1,7 @@
 // セキュリティってなあに？
-import { google, calendar_v3 } from 'googleapis';
+import { google, calendar_v3 } from "googleapis";
 import { type NextRequest } from "next/server";
-import { firebaseAdminApp } from '@/firebase/server-app';
+import { firebaseAdminApp } from "@/firebase/server-app";
 
 function createOAuth2Client() {
   return new google.auth.OAuth2(
@@ -9,7 +9,8 @@ function createOAuth2Client() {
     process.env.GOOGLE_CALENDAR_CLIENT_SECRET,
     process.env.NODE_ENV === "development"
       ? "https://localhost:3000/api/auth/google-cal/callback"
-      : "https://taskyell.vercel.app/api/auth/google-cal/callback");
+      : "https://taskyell.vercel.app/api/auth/google-cal/callback",
+  );
 }
 
 function getDate(date: calendar_v3.Schema$EventDateTime | undefined) {
@@ -66,7 +67,10 @@ export async function GET(req: NextRequest) {
     description: event.description || "",
     start: getDate(event.start),
     end: getDate(event.end),
-    attendees: event.attendees?.filter((item) => item.email).map((attendee) => attendee.email as string) || [],
+    attendees:
+      event.attendees
+        ?.filter((item) => item.email)
+        .map((attendee) => attendee.email as string) || [],
     importance: "medium",
     location: null,
     reccurence: event.recurrence || [],
