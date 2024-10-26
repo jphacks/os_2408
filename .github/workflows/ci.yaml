@@ -10,8 +10,7 @@ on: push
 
 jobs:
   preview:
-    if: ${{ github.ref != 'refs/heads/release' }}
-    needs: test
+    if: ${{ github.ref != 'refs/heads/main' }}
     runs-on: ubuntu-latest
     environment:
       name: preview
@@ -46,8 +45,7 @@ jobs:
         run: vercel alias ${{ steps.deploy.outputs.url }} stg.my-service.com --scope=my-team --token=${{ secrets.VERCEL_TOKEN }}
 
   prod:
-    if: ${{ github.ref == 'refs/heads/release' }}
-    needs: test
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
