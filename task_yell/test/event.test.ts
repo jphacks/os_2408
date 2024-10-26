@@ -7,6 +7,13 @@ import {
   deleteEvent,
 } from "../src/lib/events";
 import { Event } from "../src/lib/types";
+import {
+  createData,
+  readData,
+  readSingleData,
+  updateData,
+  deleteData,
+} from "../src/firebase/firestore";
 
 // Firebase 認証をモック
 jest.mock("../src/firebase/client-app", () => ({
@@ -40,48 +47,59 @@ describe("Event CRUD operations", () => {
     reccurence: ["weekly"],
   };
 
-  it("should create an event", async () => {
-    const { createData } = require("../src/firebase/firestore");
-    (createData as jest.Mock).mockResolvedValue("mockEventId");
+  const mockUserId = "mockUserId";
 
-    const eventId = await createEvent(mockEvent);
-    expect(eventId).toBe("mockEventId");
-    expect(createData).toHaveBeenCalledWith("events", mockEvent);
+  it("should create an event", async () => {
+    (createData as jest.Mock).mockResolvedValue("mockEventId");
+    (readData as jest.Mock).mockResolvedValue([]);
+
+    const result = await createEvent(mockUserId, mockEvent);
+    expect(result).toBeNull();
+    expect(createData).toHaveBeenCalledWith(
+      `users/${mockUserId}/events`,
+      mockEvent
+    );
   });
 
   it("should read all events", async () => {
-    const { readData } = require("../src/firebase/firestore");
     (readData as jest.Mock).mockResolvedValue([mockEvent]);
 
-    const events = await readEvents();
+    const events = await readEvents(mockUserId);
     expect(events).toEqual([mockEvent]);
-    expect(readData).toHaveBeenCalledWith("events");
+    expect(readData).toHaveBeenCalledWith(`users/${mockUserId}/events`);
   });
 
   it("should read a single event", async () => {
-    const { readSingleData } = require("../src/firebase/firestore");
     (readSingleData as jest.Mock).mockResolvedValue(mockEvent);
 
-    const event = await readSingleEvent("mockEventId");
+    const event = await readSingleEvent(mockUserId, "mockEventId");
     expect(event).toEqual(mockEvent);
-    expect(readSingleData).toHaveBeenCalledWith("events", "mockEventId");
+    expect(readSingleData).toHaveBeenCalledWith(
+      `users/${mockUserId}/events`,
+      "mockEventId"
+    );
   });
 
   it("should update an event", async () => {
-    const { updateData } = require("../src/firebase/firestore");
     (updateData as jest.Mock).mockResolvedValue(undefined);
 
-    await updateEvent("mockEventId", { title: "Updated Event" });
-    expect(updateData).toHaveBeenCalledWith("events", "mockEventId", {
-      title: "Updated Event",
-    });
+    await updateEvent(mockUserId, "mockEventId", { title: "Updated Event" });
+    expect(updateData).toHaveBeenCalledWith(
+      `users/${mockUserId}/events`,
+      "mockEventId",
+      {
+        title: "Updated Event",
+      }
+    );
   });
 
   it("should delete an event", async () => {
-    const { deleteData } = require("../src/firebase/firestore");
     (deleteData as jest.Mock).mockResolvedValue(undefined);
 
-    await deleteEvent("mockEventId");
-    expect(deleteData).toHaveBeenCalledWith("events", "mockEventId");
+    await deleteEvent(mockUserId, "mockEventId");
+    expect(deleteData).toHaveBeenCalledWith(
+      `users/${mockUserId}/events`,
+      "mockEventId"
+    );
   });
 });
