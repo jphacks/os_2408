@@ -42,8 +42,6 @@ import {
   getDay,
   isToday,
   isFuture,
-  parseISO,
-  getHours,
 } from "date-fns";
 import { ja } from "date-fns/locale";
 import { Calendar } from "@/components/ui/calendar";
@@ -375,16 +373,21 @@ function EventCreator({
   );
 }
 
-export default function page() {
+export default function Page() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [todoDate, setTodoDate] = useState<Date>(selectedDate);
   const [selectedDateTodos, setSelectedDateTodos] = useState<Todo[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [priority, setPriority] = useState<Priority>("medium");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [category, setCategory] = useState<Category>("other");
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchTerm, setSearchTerm] = useState("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
@@ -574,6 +577,7 @@ export default function page() {
     </motion.div>
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const filteredTodos = useMemo(() => {
     return todos.filter(
       (todo) =>
