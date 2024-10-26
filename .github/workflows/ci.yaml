@@ -9,8 +9,6 @@ env:
 on: push
 
 jobs:
-  test:
-    # 略
 
   preview:
     if: ${{ github.ref != 'refs/heads/release' }}
