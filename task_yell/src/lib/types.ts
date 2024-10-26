@@ -9,6 +9,14 @@ export interface Event {
   reccurence: string[];
 }
 
+export interface Task {
+  title: string;
+  description: string;
+  due: Date;
+  importance: "high" | "medium" | "low";
+  reccurence: string[];
+}
+
 export interface Notification {
   datetime: Date;
   type: "call" | "push";
