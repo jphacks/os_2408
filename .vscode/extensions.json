@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "jawandarajbir.react-vscode-extension-pack",
+    "bradlc.vscode-tailwindcss",
+  ]
+}
