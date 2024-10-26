@@ -47,7 +47,7 @@ describe("WantTodo CRUD operations", () => {
 
     expect(createData).toHaveBeenCalledWith(
       `users/${mockUserId}/want-todos`,
-      mockWantTodo
+      mockWantTodo,
     );
   });
 
@@ -66,7 +66,7 @@ describe("WantTodo CRUD operations", () => {
     expect(wantTodo).toEqual(mockWantTodo);
     expect(readSingleData).toHaveBeenCalledWith(
       `users/${mockUserId}/want-todos`,
-      "mockWantTodoId"
+      "mockWantTodoId",
     );
   });
 
@@ -81,7 +81,7 @@ describe("WantTodo CRUD operations", () => {
       "mockWantTodoId",
       {
         title: "Updated WantTodo",
-      }
+      },
     );
   });
 
@@ -91,7 +91,7 @@ describe("WantTodo CRUD operations", () => {
     await deleteWantTodo(mockUserId, "mockWantTodoId");
     expect(deleteData).toHaveBeenCalledWith(
       `users/${mockUserId}/want-todos`,
-      "mockWantTodoId"
+      "mockWantTodoId",
     );
   });
 });
