@@ -21,6 +21,9 @@ jobs:
           node-version: 18
           check-latest: true
 
+      - name: Mv directory
+        run: cd ./task_yell
+
       - name: Install dependencies
         run: npm install
 
