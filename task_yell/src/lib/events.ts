@@ -22,7 +22,7 @@ export async function readSingleEvent(id: string): Promise<Event | null> {
 
 export async function updateEvent(
   id: string,
-  eventData: Partial<Event>
+  eventData: Partial<Event>,
 ): Promise<void> {
   return updateData<Event>(COLLECTION_NAME, id, eventData);
 }

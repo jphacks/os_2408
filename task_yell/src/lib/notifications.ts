@@ -8,7 +8,9 @@ import {
 } from "../firebase/firestore";
 const COLLECTION_NAME = "notifications";
 
-export async function createNotification(notification:Notification ): Promise<string> {
+export async function createNotification(
+  notification: Notification,
+): Promise<string> {
   return createData(COLLECTION_NAME, notification);
 }
 
@@ -16,13 +18,15 @@ export async function readNotification(): Promise<Notification[]> {
   return readData<Notification>(COLLECTION_NAME);
 }
 
-export async function readSingleNotification(id: string): Promise<Notification | null> {
+export async function readSingleNotification(
+  id: string,
+): Promise<Notification | null> {
   return readSingleData<Notification>(COLLECTION_NAME, id);
 }
 
 export async function updateNotification(
   id: string,
-  NotificationData: Partial<Notification>
+  NotificationData: Partial<Notification>,
 ): Promise<void> {
   return updateData<Notification>(COLLECTION_NAME, id, NotificationData);
 }
