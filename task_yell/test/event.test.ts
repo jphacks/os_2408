@@ -57,7 +57,7 @@ describe("Event CRUD operations", () => {
     expect(result).toBeNull();
     expect(createData).toHaveBeenCalledWith(
       `users/${mockUserId}/events`,
-      mockEvent
+      mockEvent,
     );
   });
 
@@ -76,7 +76,7 @@ describe("Event CRUD operations", () => {
     expect(event).toEqual(mockEvent);
     expect(readSingleData).toHaveBeenCalledWith(
       `users/${mockUserId}/events`,
-      "mockEventId"
+      "mockEventId",
     );
   });
 
@@ -89,7 +89,7 @@ describe("Event CRUD operations", () => {
       "mockEventId",
       {
         title: "Updated Event",
-      }
+      },
     );
   });
 
@@ -99,7 +99,7 @@ describe("Event CRUD operations", () => {
     await deleteEvent(mockUserId, "mockEventId");
     expect(deleteData).toHaveBeenCalledWith(
       `users/${mockUserId}/events`,
-      "mockEventId"
+      "mockEventId",
     );
   });
 });

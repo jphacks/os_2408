@@ -16,12 +16,12 @@ const COLLECTION_NAME = "events";
  */
 export async function createEvent(
   userId: string,
-  event: Event
+  event: Event,
 ): Promise<Event[] | null> {
   // event.start ~ event.end とコンフリクトする予定があるかどうかを確認する
   const events = await readEvents(userId);
   const isConflict = events.some(
-    (e) => event.start <= e.end && event.end >= e.start
+    (e) => event.start <= e.end && event.end >= e.start,
   );
   if (isConflict) {
     return events;
@@ -37,7 +37,7 @@ export async function readEvents(userId: string): Promise<Event[]> {
 
 export async function readSingleEvent(
   userId: string,
-  id: string
+  id: string,
 ): Promise<Event | null> {
   return readSingleData<Event>(`users/${userId}/${COLLECTION_NAME}`, id);
 }
@@ -45,7 +45,7 @@ export async function readSingleEvent(
 export async function updateEvent(
   userId: string,
   id: string,
-  eventData: Partial<Event>
+  eventData: Partial<Event>,
 ): Promise<void> {
   return updateData<Event>(`users/${userId}/${COLLECTION_NAME}`, id, eventData);
 }
