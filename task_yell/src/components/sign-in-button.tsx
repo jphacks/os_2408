@@ -26,24 +26,24 @@ function useUserSession() {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged((authUser) => {
-      setUser(authUser)
-    })
+      setUser(authUser);
+    });
 
-    return () => unsubscribe()
+    return () => unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     onAuthStateChanged((authUser) => {
-      if (user === undefined) return
+      if (user === undefined) return;
 
       // refresh when user changed to ease testing
       if (user?.email !== authUser?.email) {
-        router.refresh()
+        router.refresh();
       }
-    })
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, router.refresh])
+  }, [user, router.refresh]);
 
   return user;
 }
@@ -55,15 +55,17 @@ export function SignInButton() {
     await signInWithPopup(auth, provider);
   }, []);
   const handleSignOut = useCallback(async () => {
-    console.log("signing out")
+    console.log("signing out");
     await auth.signOut();
   }, []);
 
-  return !user ?
-    (<button type="button" onClick={handleSignIn} >
+  return !user ? (
+    <button type="button" onClick={handleSignIn}>
       サインイン
-    </button>) : (<button type="button" onClick={handleSignOut}>
+    </button>
+  ) : (
+    <button type="button" onClick={handleSignOut}>
       サインアウト
     </button>
-    )
+  );
 }
