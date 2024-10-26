@@ -6,14 +6,58 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Menu, CalendarIcon, ChevronLeft, ChevronRight, Edit, Trash2, MapPinIcon, UserPlusIcon } from "lucide-react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, getDay, isToday, isFuture, parseISO, getHours } from "date-fns";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Menu,
+  CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+  Edit,
+  Trash2,
+  MapPinIcon,
+  UserPlusIcon,
+} from "lucide-react";
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
+  addMonths,
+  subMonths,
+  getDay,
+  isToday,
+  isFuture,
+  parseISO,
+  getHours,
+} from "date-fns";
 import { ja } from "date-fns/locale";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 
@@ -54,7 +98,12 @@ const priorityColors: Record<Priority, string> = {
 
 const categoryIcons: Record<Category, JSX.Element> = {
   work: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-4 w-4"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+    >
       <path
         fillRule="evenodd"
         d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"
@@ -64,22 +113,50 @@ const categoryIcons: Record<Category, JSX.Element> = {
     </svg>
   ),
   personal: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-4 w-4"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+    >
+      <path
+        fillRule="evenodd"
+        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+        clipRule="evenodd"
+      />
     </svg>
   ),
   shopping: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-4 w-4"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+    >
       <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
     </svg>
   ),
   health: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-      <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-4 w-4"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+    >
+      <path
+        fillRule="evenodd"
+        d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+        clipRule="evenodd"
+      />
     </svg>
   ),
   other: (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-4 w-4"
+      viewBox="0 0 20 20"
+      fill="currentColor"
+    >
       <path
         fillRule="evenodd"
         d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
@@ -89,7 +166,13 @@ const categoryIcons: Record<Category, JSX.Element> = {
   ),
 };
 
-function EventCreator({ onSave, onCancel }: { onSave: (event: Event) => void; onCancel: () => void }) {
+function EventCreator({
+  onSave,
+  onCancel,
+}: {
+  onSave: (event: Event) => void;
+  onCancel: () => void;
+}) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -147,11 +230,19 @@ function EventCreator({ onSave, onCancel }: { onSave: (event: Event) => void; on
   return (
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
-        <Checkbox id="is-task" checked={isTask} onCheckedChange={(checked) => setIsTask(checked as boolean)} />
+        <Checkbox
+          id="is-task"
+          checked={isTask}
+          onCheckedChange={(checked) => setIsTask(checked as boolean)}
+        />
         <Label htmlFor="is-task">タスクにする</Label>
       </div>
 
-      <Input placeholder="タイトルを追加" value={title} onChange={(e) => setTitle(e.target.value)} />
+      <Input
+        placeholder="タイトルを追加"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
 
       {!isTask && (
         <>
@@ -159,16 +250,28 @@ function EventCreator({ onSave, onCancel }: { onSave: (event: Event) => void; on
             <CalendarIcon className="text-gray-500" />
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline">{date ? format(date, "yyyy年MM月dd日 (E)", { locale: ja }) : "日付を選択"}</Button>
+                <Button variant="outline">
+                  {date
+                    ? format(date, "yyyy年MM月dd日 (E)", { locale: ja })
+                    : "日付を選択"}
+                </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0">
-                <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={setDate}
+                  initialFocus
+                />
               </PopoverContent>
             </Popover>
           </div>
 
           <div className="flex items-center space-x-2">
-            <Select value={startTime} onValueChange={(value) => handleTimeChange(value, true)}>
+            <Select
+              value={startTime}
+              onValueChange={(value) => handleTimeChange(value, true)}
+            >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="開始時間" />
               </SelectTrigger>
@@ -181,7 +284,10 @@ function EventCreator({ onSave, onCancel }: { onSave: (event: Event) => void; on
               </SelectContent>
             </Select>
             <span>-</span>
-            <Select value={endTime} onValueChange={(value) => handleTimeChange(value, false)}>
+            <Select
+              value={endTime}
+              onValueChange={(value) => handleTimeChange(value, false)}
+            >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="終了時間" />
               </SelectTrigger>
@@ -195,19 +301,34 @@ function EventCreator({ onSave, onCancel }: { onSave: (event: Event) => void; on
             </Select>
           </div>
 
-          <Textarea placeholder="説明を追加" value={description} onChange={(e) => setDescription(e.target.value)} />
+          <Textarea
+            placeholder="説明を追加"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
 
           <div className="flex items-center space-x-2">
             <UserPlusIcon className="text-gray-500" />
-            <Input placeholder="招待" value={invitees} onChange={(e) => setInvitees(e.target.value)} />
+            <Input
+              placeholder="招待"
+              value={invitees}
+              onChange={(e) => setInvitees(e.target.value)}
+            />
           </div>
 
           <div className="flex items-center space-x-2">
             <MapPinIcon className="text-gray-500" />
-            <Input placeholder="場所または会議URLを追加" value={location} onChange={(e) => setLocation(e.target.value)} />
+            <Input
+              placeholder="場所または会議URLを追加"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
           </div>
 
-          <Select value={category} onValueChange={(value: Category) => setCategory(value)}>
+          <Select
+            value={category}
+            onValueChange={(value: Category) => setCategory(value)}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="カテゴリを選択" />
             </SelectTrigger>
@@ -220,7 +341,10 @@ function EventCreator({ onSave, onCancel }: { onSave: (event: Event) => void; on
             </SelectContent>
           </Select>
 
-          <Select value={priority} onValueChange={(value: Priority) => setPriority(value)}>
+          <Select
+            value={priority}
+            onValueChange={(value: Priority) => setPriority(value)}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="重要度を選択" />
             </SelectTrigger>
@@ -231,7 +355,11 @@ function EventCreator({ onSave, onCancel }: { onSave: (event: Event) => void; on
             </SelectContent>
           </Select>
           <div className="flex items-center space-x-2">
-            <Checkbox id="is-locked" checked={isLocked} onCheckedChange={(checked) => setIsLocked(checked as boolean)} />
+            <Checkbox
+              id="is-locked"
+              checked={isLocked}
+              onCheckedChange={(checked) => setIsLocked(checked as boolean)}
+            />
             <Label htmlFor="is-locked">ロックする</Label>
           </div>
         </>
@@ -262,7 +390,9 @@ export default function page() {
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
 
   useEffect(() => {
-    const filteredTodos = todos.filter((todo) => isSameDay(todo.date, selectedDate));
+    const filteredTodos = todos.filter((todo) =>
+      isSameDay(todo.date, selectedDate),
+    );
     setSelectedDateTodos(filteredTodos);
   }, [selectedDate, todos]);
 
@@ -275,10 +405,14 @@ export default function page() {
   }, [isDarkMode]);
 
   const toggleTodo = (id: number) => {
-    const updatedTodos = todos.map((todo) => (todo.id === id ? { ...todo, completed: !todo.completed } : todo));
+    const updatedTodos = todos.map((todo) =>
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo,
+    );
     setTodos(updatedTodos);
     if (selectedDate) {
-      const updatedSelectedDateTodos = selectedDateTodos.map((todo) => (todo.id === id ? { ...todo, completed: !todo.completed } : todo));
+      const updatedSelectedDateTodos = selectedDateTodos.map((todo) =>
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo,
+      );
       setSelectedDateTodos(updatedSelectedDateTodos);
     }
   };
@@ -331,7 +465,10 @@ export default function page() {
     return (
       <div className="grid grid-cols-7 gap-1 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
         {["日", "月", "火", "水", "木", "金", "土"].map((day) => (
-          <div key={day} className="text-center font-semibold text-gray-600 dark:text-gray-300 p-2">
+          <div
+            key={day}
+            className="text-center font-semibold text-gray-600 dark:text-gray-300 p-2"
+          >
             {day}
           </div>
         ))}
@@ -357,7 +494,11 @@ export default function page() {
               whileTap={{ scale: 0.95 }}
             >
               <div className="text-center">{format(day, "d")}</div>
-              {(todoCount > 0 || eventCount > 0) && <div className="text-xs text-center mt-1 font-bold">{todoCount + eventCount}</div>}
+              {(todoCount > 0 || eventCount > 0) && (
+                <div className="text-xs text-center mt-1 font-bold">
+                  {todoCount + eventCount}
+                </div>
+              )}
             </motion.div>
           );
         })}
@@ -379,13 +520,22 @@ export default function page() {
       transition={{ duration: 0.3 }}
       className={`flex items-center p-2 rounded ${todo.completed ? "bg-gray-200 dark:bg-gray-700" : priorityColors[todo.priority]} transition-colors duration-200`}
     >
-      <Checkbox id={`todo-${todo.id}`} checked={todo.completed} onCheckedChange={() => toggleTodo(todo.id)} />
-      <label htmlFor={`todo-${todo.id}`} className={`ml-2 flex-grow ${todo.completed ? "line-through text-gray-500 dark:text-gray-400" : ""}`}>
+      <Checkbox
+        id={`todo-${todo.id}`}
+        checked={todo.completed}
+        onCheckedChange={() => toggleTodo(todo.id)}
+      />
+      <label
+        htmlFor={`todo-${todo.id}`}
+        className={`ml-2 flex-grow ${todo.completed ? "line-through text-gray-500 dark:text-gray-400" : ""}`}
+      >
         {todo.text}
       </label>
       <div className="flex items-center space-x-2">
         {categoryIcons[todo.category]}
-        <span className="text-sm text-gray-500 dark:text-gray-400">{format(todo.date, "yyyy/MM/dd", { locale: ja })}</span>
+        <span className="text-sm text-gray-500 dark:text-gray-400">
+          {format(todo.date, "yyyy/MM/dd", { locale: ja })}
+        </span>
         <Button variant="ghost" size="icon" onClick={() => editTodo(todo)}>
           <Edit className="h-4 w-4" />
         </Button>
@@ -408,11 +558,14 @@ export default function page() {
         <h4 className="font-semibold">{event.title}</h4>
         {!event.isTask && (
           <>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{event.description}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {event.description}
+            </p>
             <div className="flex items-center space-x-2 mt-1">
               {categoryIcons[event.category]}
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {format(event.start, "yyyy/MM/dd HH:mm", { locale: ja })} - {format(event.end, "HH:mm", { locale: ja })}
+                {format(event.start, "yyyy/MM/dd HH:mm", { locale: ja })} -{" "}
+                {format(event.end, "HH:mm", { locale: ja })}
               </span>
             </div>
           </>
@@ -422,18 +575,26 @@ export default function page() {
   );
 
   const filteredTodos = useMemo(() => {
-    return todos.filter((todo) => todo.text.toLowerCase().includes(searchTerm.toLowerCase()) || format(todo.date, "yyyy/MM/dd").includes(searchTerm));
+    return todos.filter(
+      (todo) =>
+        todo.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        format(todo.date, "yyyy/MM/dd").includes(searchTerm),
+    );
   }, [todos, searchTerm]);
 
   const filteredEvents = useMemo(() => {
     return events.filter(
       (event) =>
-        event.title.toLowerCase().includes(searchTerm.toLowerCase()) || event.description.toLowerCase().includes(searchTerm.toLowerCase()) || format(event.start, "yyyy/MM/dd").includes(searchTerm)
+        event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        format(event.start, "yyyy/MM/dd").includes(searchTerm),
     );
   }, [events, searchTerm]);
 
   const sortedEvents = useMemo(() => {
-    return [...filteredEvents].sort((a, b) => b.start.getTime() - a.start.getTime());
+    return [...filteredEvents].sort(
+      (a, b) => b.start.getTime() - a.start.getTime(),
+    );
   }, [filteredEvents]);
 
   const recentTodos = todos
@@ -442,11 +603,17 @@ export default function page() {
     .slice(0, 5);
 
   return (
-    <div className={`relative h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden ${isDarkMode ? "dark" : ""}`}>
+    <div
+      className={`relative h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden ${isDarkMode ? "dark" : ""}`}
+    >
       {/* ハンバーガーメニューとその中身 */}
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="fixed top-4 left-4 z-50 w-12 h-12 bg-white dark:bg-gray-800 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="fixed top-4 left-4 z-50 w-12 h-12 bg-white dark:bg-gray-800 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
             <Menu className="h-6 w-6" />
             <span className="sr-only">メニューを開く</span>
           </Button>
@@ -457,7 +624,11 @@ export default function page() {
           </SheetHeader>
           <div className="mt-4 space-y-4">
             <div className="flex items-center space-x-2">
-              <Switch id="dark-mode" checked={isDarkMode} onCheckedChange={setIsDarkMode} />
+              <Switch
+                id="dark-mode"
+                checked={isDarkMode}
+                onCheckedChange={setIsDarkMode}
+              />
               <Label htmlFor="dark-mode">ダークモード</Label>
             </div>
           </div>
@@ -469,15 +640,25 @@ export default function page() {
         <div className="w-full lg:w-1/2 pr-2 overflow-auto">
           <div className="mb-4 flex justify-between items-center">
             {/* カレンダーを先月に移動するボタン */}
-            <Button variant="outline" size="icon" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
+            >
               <ChevronLeft className="h-4 w-4" />
             </Button>
 
             {/* 現在表示中の月 */}
-            <h2 className="text-xl lg:text-2xl font-bold dark:text-white">{format(currentMonth, "yyyy年MM月", { locale: ja })}</h2>
+            <h2 className="text-xl lg:text-2xl font-bold dark:text-white">
+              {format(currentMonth, "yyyy年MM月", { locale: ja })}
+            </h2>
 
             {/* カレンダーを次月にするボタン */}
-            <Button variant="outline" size="icon" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
+            >
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -488,7 +669,9 @@ export default function page() {
 
         {/* 以下divタグが全体ページ右側 */}
         <div className="w-full lg:w-1/2 pl-2 bg-white dark:bg-gray-800 overflow-auto lg:block hidden">
-          <h3 className="text-lg font-semibold mt-8 mb-4 dark:text-white">イベント</h3>
+          <h3 className="text-lg font-semibold mt-8 mb-4 dark:text-white">
+            イベント
+          </h3>
           <AnimatePresence>
             {sortedEvents.map((event) => (
               <EventItem key={event.id} event={event} />
@@ -498,7 +681,9 @@ export default function page() {
 
         {/* 以下のdivタグ部分はスマホ画面のみ表示 */}
         <div className="mt-4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 lg:hidden">
-          <h3 className="text-lg font-semibold mb-2 dark:text-white">直近のTODO</h3>
+          <h3 className="text-lg font-semibold mb-2 dark:text-white">
+            直近のTODO
+          </h3>
           {recentTodos.length > 0 ? (
             <ul className="space-y-2">
               {recentTodos.map((todo) => (
@@ -517,9 +702,14 @@ export default function page() {
       <Dialog open={isEventModalOpen} onOpenChange={setIsEventModalOpen}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle>{format(selectedDate, "yyyy年MM月dd日", { locale: ja })}の予定</DialogTitle>
+            <DialogTitle>
+              {format(selectedDate, "yyyy年MM月dd日", { locale: ja })}の予定
+            </DialogTitle>
           </DialogHeader>
-          <EventCreator onSave={addEvent} onCancel={() => setIsEventModalOpen(false)} />
+          <EventCreator
+            onSave={addEvent}
+            onCancel={() => setIsEventModalOpen(false)}
+          />
         </DialogContent>
       </Dialog>
     </div>
