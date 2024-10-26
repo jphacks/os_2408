@@ -42,7 +42,7 @@ export async function readSingleWantTodo(id: string): Promise<WantTodo | null> {
  * @param id 更新するイベントのID。
  * @param wantTodoData 新規WantTodoデータ。
  */
-export async function updateEvent(
+export async function updateWantTodo(
   id: string,
   wantTodoData: Partial<WantTodo>,
 ): Promise<void> {

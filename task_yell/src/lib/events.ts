@@ -1,4 +1,5 @@
 import {
+  createData,
   deleteData,
   readData,
   readSingleData,
@@ -19,7 +20,12 @@ export async function createEvent(event: Event): Promise<Event[] | null> {
   const isConflict = events.some(
     (e) => event.start <= e.end && event.end >= e.start,
   );
-  return isConflict ? events : null;
+  if (isConflict) {
+    return events;
+  } else {
+    await createData<Event>(COLLECTION_NAME, event);
+    return null;
+  }
 }
 
 export async function readEvents(): Promise<Event[]> {
