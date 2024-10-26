@@ -44,7 +44,7 @@ export async function readSingleWantTodo(id: string): Promise<WantTodo | null> {
  */
 export async function updateEvent(
   id: string,
-  wantTodoData: Partial<WantTodo>
+  wantTodoData: Partial<WantTodo>,
 ): Promise<void> {
   return updateData<WantTodo>(COLLECTION_NAME, id, wantTodoData);
 }

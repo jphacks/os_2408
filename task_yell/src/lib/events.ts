@@ -17,7 +17,7 @@ export async function createEvent(event: Event): Promise<Event[] | null> {
   // event.start ~ event.end とコンフリクトする予定があるかどうかを確認する
   const events = await readEvents();
   const isConflict = events.some(
-    (e) => event.start <= e.end && event.end >= e.start
+    (e) => event.start <= e.end && event.end >= e.start,
   );
   return isConflict ? events : null;
 }
@@ -32,7 +32,7 @@ export async function readSingleEvent(id: string): Promise<Event | null> {
 
 export async function updateEvent(
   id: string,
-  eventData: Partial<Event>
+  eventData: Partial<Event>,
 ): Promise<void> {
   return updateData<Event>(COLLECTION_NAME, id, eventData);
 }

@@ -45,7 +45,7 @@ export async function readSingleTask(id: string): Promise<Task | null> {
  */
 export async function updateTask(
   id: string,
-  taskData: Partial<Task>
+  taskData: Partial<Task>,
 ): Promise<void> {
   await updateData<Task>(COLLECTION_NAME, id, taskData);
 }
