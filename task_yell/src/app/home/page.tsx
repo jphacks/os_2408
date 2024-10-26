@@ -2,7 +2,6 @@
 
 import { DateTimeInput } from "@/components/date-time-input";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
@@ -12,11 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -43,13 +37,12 @@ import {
   addMonths,
   eachDayOfInterval,
   endOfMonth,
+  endOfWeek,
   format,
-  getDay,
-  isFuture,
   isSameDay,
   isSameMonth,
-  isToday,
   startOfMonth,
+  startOfWeek,
   subMonths,
 } from "date-fns";
 import { ja } from "date-fns/locale";
@@ -96,90 +89,27 @@ type Event = {
   isLocked: boolean;
 };
 
+type StickyNote = {
+  id: number;
+  title: string;
+};
+
 const priorityColors: Record<Priority, string> = {
   low: "bg-blue-100 dark:bg-blue-900",
   medium: "bg-yellow-100 dark:bg-yellow-900",
   high: "bg-red-100 dark:bg-red-900",
 };
 
-const categoryIcons: Record<Category, JSX.Element> = {
-  work: (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-4 w-4"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-    >
-      <path
-        fillRule="evenodd"
-        d="M6 6V5a3 3 0 013-3h2a3 3 0 013 3v1h2a2 2 0 012 2v3.57A22.952 22.952 0 0110 13a22.95 22.95 0 01-8-1.43V8a2 2 0 012-2h2zm2-1a1 1 0 011-1h2a1 1 0 011 1v1H8V5zm1 5a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1z"
-        clipRule="evenodd"
-      />
-      <path d="M2 13.692V16a2 2 0 002 2h12a2 2 0 002-2v-2.308A24.974 24.974 0 0110 15c-2.796 0-5.487-.46-8-1.308z" />
-    </svg>
-  ),
-  personal: (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-4 w-4"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-    >
-      <path
-        fillRule="evenodd"
-        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-        clipRule="evenodd"
-      />
-    </svg>
-  ),
-  shopping: (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-4 w-4"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-    >
-      <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-    </svg>
-  ),
-  health: (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-4 w-4"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-    >
-      <path
-        fillRule="evenodd"
-        d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-        clipRule="evenodd"
-      />
-    </svg>
-  ),
-  other: (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-4 w-4"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-    >
-      <path
-        fillRule="evenodd"
-        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z"
-        clipRule="evenodd"
-      />
-    </svg>
-  ),
-};
-
 function EventCreator({
   onSave,
   onCancel,
+  initialTitle = "",
 }: {
   onSave: (event: Event) => void;
   onCancel: () => void;
+  initialTitle?: string;
 }) {
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState("");
   const [date] = useState<Date | undefined>(new Date());
   const [startTime] = useState("10:00");
@@ -231,7 +161,7 @@ function EventCreator({
         </div>
       </div>
       <div className="w-3/5 space-y-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center space-x-2">
           <Checkbox
             id="is-task"
             checked={isTask}
@@ -324,7 +254,8 @@ function EventCreator({
           />
           <Label htmlFor="is-locked">ロックする</Label>
         </div>
-        <div className="flex justify-end gap-2">
+
+        <div className="flex justify-end space-x-2">
           <Button variant="outline" onClick={onCancel}>
             キャンセル
           </Button>
@@ -335,33 +266,31 @@ function EventCreator({
   );
 }
 
-export default function Page() {
-  const [todos, setTodos] = useState<Todo[]>([]);
+export default function Home() {
+  const [todos] = useState<Todo[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
-  const [newTodo, setNewTodo] = useState("");
+  const [stickyNotes, setStickyNotes] = useState<StickyNote[]>([]);
+  const [newStickyNote, setNewStickyNote] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [todoDate, setTodoDate] = useState<Date>(selectedDate);
-  const [selectedDateTodos, setSelectedDateTodos] = useState<Todo[]>([]);
-  const [priority, setPriority] = useState<Priority>("medium");
-  const [category, setCategory] = useState<Category>("other");
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalState, setModalState] = useState<
     "minimized" | "partial" | "full"
   >("partial");
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
+  const [editingStickyNote, setEditingStickyNote] = useState<StickyNote | null>(
+    null
+  );
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
+  const [draggedStickyNote, setDraggedStickyNote] = useState<StickyNote | null>(
+    null
+  );
+  const [removedStickyNote, setRemovedStickyNote] = useState<StickyNote | null>(
+    null
+  );
   const dragControls = useDragControls();
   const modalRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const filteredTodos = todos.filter((todo) =>
-      isSameDay(todo.date, selectedDate)
-    );
-    setSelectedDateTodos(filteredTodos);
-  }, [selectedDate, todos]);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -371,66 +300,46 @@ export default function Page() {
     }
   }, [isDarkMode]);
 
-  const addTodo = () => {
-    if (newTodo.trim() && todoDate) {
-      const newTodoItem = {
-        id: Date.now(),
-        text: newTodo,
-        completed: false,
-        date: todoDate,
-        priority,
-        category,
-      };
-      setTodos([...todos, newTodoItem]);
-      setNewTodo("");
-      setTodoDate(new Date());
-      setPriority("medium");
-      setCategory("other");
-      if (isSameDay(todoDate, selectedDate)) {
-        setSelectedDateTodos([...selectedDateTodos, newTodoItem]);
-      }
+  const addStickyNote = () => {
+    if (newStickyNote.trim()) {
+      const newNote: StickyNote = { id: Date.now(), title: newStickyNote };
+      setStickyNotes([...stickyNotes, newNote]);
+      setNewStickyNote("");
     }
   };
 
-  const toggleTodo = (id: number) => {
-    const updatedTodos = todos.map((todo) =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+  const editStickyNote = (note: StickyNote) => {
+    setEditingStickyNote(note);
+  };
+
+  const updateStickyNote = (updatedNote: StickyNote) => {
+    const updatedNotes = stickyNotes.map((note) =>
+      note.id === updatedNote.id ? updatedNote : note
     );
-    setTodos(updatedTodos);
-    if (selectedDate) {
-      const updatedSelectedDateTodos = selectedDateTodos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      );
-      setSelectedDateTodos(updatedSelectedDateTodos);
+    setStickyNotes(updatedNotes);
+    setEditingStickyNote(null);
+  };
+
+  const deleteStickyNote = (id: number) => {
+    const noteToRemove = stickyNotes.find((note) => note.id === id);
+    if (noteToRemove) {
+      setRemovedStickyNote(noteToRemove);
+      setStickyNotes(stickyNotes.filter((note) => note.id !== id));
     }
-  };
-
-  const editTodo = (todo: Todo) => {
-    setEditingTodo(todo);
-  };
-
-  const updateTodo = (updatedTodo: Todo) => {
-    const updatedTodos = todos.map((todo) =>
-      todo.id === updatedTodo.id ? updatedTodo : todo
-    );
-    setTodos(updatedTodos);
-    setEditingTodo(null);
-  };
-
-  const deleteTodo = (id: number) => {
-    const updatedTodos = todos.filter((todo) => todo.id !== id);
-    setTodos(updatedTodos);
-    setSelectedDateTodos(selectedDateTodos.filter((todo) => todo.id !== id));
+    if (draggedStickyNote && draggedStickyNote.id === id) {
+      setDraggedStickyNote(null);
+    }
   };
 
   const addEvent = (newEvent: Event) => {
     setEvents([...events, newEvent]);
     setIsEventModalOpen(false);
+    setRemovedStickyNote(null);
   };
 
   const getDaysInMonth = (date: Date) => {
-    const start = startOfMonth(date);
-    const end = endOfMonth(date);
+    const start = startOfWeek(startOfMonth(date), { weekStartsOn: 0 });
+    const end = endOfWeek(endOfMonth(date), { weekStartsOn: 0 });
     return eachDayOfInterval({ start, end });
   };
 
@@ -453,8 +362,7 @@ export default function Page() {
 
   const renderCalendar = () => {
     const days = getDaysInMonth(currentMonth);
-    const firstDayOfMonth = getDay(days[0]);
-    const weeks = Math.ceil((days.length + firstDayOfMonth) / 7);
+    const weeks = Math.ceil(days.length / 7);
 
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
@@ -469,13 +377,10 @@ export default function Page() {
           ))}
         </div>
         {Array.from({ length: weeks }).map((_, weekIndex) => {
-          const weekDays = days.slice(
-            weekIndex * 7 - firstDayOfMonth,
-            (weekIndex + 1) * 7 - firstDayOfMonth
-          );
+          const weekDays = days.slice(weekIndex * 7, (weekIndex + 1) * 7);
           const maxEventsInWeek = Math.max(
-            ...weekDays.map((day) =>
-              day ? getTodoCountForDay(day) + getEventCountForDay(day) : 0
+            ...weekDays.map(
+              (day) => getTodoCountForDay(day) + getEventCountForDay(day)
             )
           );
           const weekHeight =
@@ -487,68 +392,80 @@ export default function Page() {
               className="grid grid-cols-7 gap-1"
               style={{ minHeight: "100px", height: weekHeight }}
             >
-              {Array(7)
-                .fill(null)
-                .map((_, dayIndex) => {
-                  const day = weekDays[dayIndex];
-                  if (!day)
-                    return (
-                      <div
-                        key={`empty-${weekIndex}-${dayIndex}`}
-                        className="p-1"
-                      ></div>
-                    );
+              {weekDays.map((day) => {
+                const todoCount = getTodoCountForDay(day);
+                const eventCount = getEventCountForDay(day);
+                const isSelected = isSameDay(day, selectedDate);
+                const isCurrentMonth = isSameMonth(day, currentMonth);
+                const dayItems = [
+                  ...todos.filter((todo) => isSameDay(todo.date, day)),
+                  ...events.filter((event) => isSameDay(event.start, day)),
+                ];
 
-                  const todoCount = getTodoCountForDay(day);
-                  const eventCount = getEventCountForDay(day);
-                  const isSelected = isSameDay(day, selectedDate);
-                  const isCurrentMonth = isSameMonth(day, currentMonth);
-                  const dayItems = [
-                    ...todos.filter((todo) => isSameDay(todo.date, day)),
-                    ...events.filter((event) => isSameDay(event.start, day)),
-                  ];
-
-                  return (
-                    <motion.div
-                      key={day.toISOString()}
-                      className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${
-                        isSelected ? "border-blue-300 dark:border-blue-600" : ""
-                      } ${
-                        !isCurrentMonth
-                          ? "text-gray-400 dark:text-gray-600"
-                          : ""
-                      } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
-                      onClick={() => handleDateSelect(day)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <div className="text-right text-sm">
-                        {format(day, "d")}
+                return (
+                  <motion.div
+                    key={day.toISOString()}
+                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${
+                      isSelected ? "border-blue-300 dark:border-blue-600" : ""
+                    } ${
+                      !isCurrentMonth
+                        ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
+                        : ""
+                    } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
+                    onClick={() => handleDateSelect(day)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.currentTarget.classList.add(
+                        "bg-blue-100",
+                        "dark:bg-blue-800"
+                      );
+                    }}
+                    onDragLeave={(e) => {
+                      e.currentTarget.classList.remove(
+                        "bg-blue-100",
+                        "dark:bg-blue-800"
+                      );
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.currentTarget.classList.remove(
+                        "bg-blue-100",
+                        "dark:bg-blue-800"
+                      );
+                      if (draggedStickyNote) {
+                        handleDateSelect(day);
+                        setIsEventModalOpen(true);
+                        deleteStickyNote(draggedStickyNote.id);
+                      }
+                    }}
+                  >
+                    <div className="text-right text-sm">{format(day, "d")}</div>
+                    {(todoCount > 0 || eventCount > 0) && (
+                      <div className="mt-1 space-y-1">
+                        {dayItems.slice(0, 2).map((item, index) => (
+                          <div
+                            key={index}
+                            className={`text-xs p-1 rounded ${
+                              "text" in item
+                                ? priorityColors[item.priority]
+                                : priorityColors[item.priority]
+                            }`}
+                          >
+                            {"text" in item ? item.text : item.title}
+                          </div>
+                        ))}
+                        {dayItems.length > 2 && (
+                          <div className="text-xs text-center font-bold">
+                            +{dayItems.length - 2} more
+                          </div>
+                        )}
                       </div>
-                      {(todoCount > 0 || eventCount > 0) && (
-                        <div className="mt-1 space-y-1">
-                          {dayItems.slice(0, 2).map((item, index) => (
-                            <div
-                              key={index}
-                              className={`text-xs p-1 rounded ${
-                                "text" in item
-                                  ? priorityColors[item.priority]
-                                  : priorityColors[item.priority]
-                              }`}
-                            >
-                              {"text" in item ? item.text : item.title}
-                            </div>
-                          ))}
-                          {dayItems.length > 2 && (
-                            <div className="text-xs text-center font-bold">
-                              +{dayItems.length - 2} more
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </motion.div>
-                  );
-                })}
+                    )}
+                  </motion.div>
+                );
+              })}
             </div>
           );
         })}
@@ -558,112 +475,60 @@ export default function Page() {
 
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
-    setTodoDate(date);
     setIsEventModalOpen(true);
   };
 
-  const TodoItem = ({ todo }: { todo: Todo }) => (
+  const StickyNoteItem = ({ note }: { note: StickyNote }) => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.3 }}
-      className={`flex items-center p-2 rounded ${
-        todo.completed
-          ? "bg-gray-200 dark:bg-gray-700"
-          : priorityColors[todo.priority]
-      } transition-colors duration-200`}
+      className="bg-yellow-200 dark:bg-yellow-700 p-4 rounded shadow-md"
+      draggable
+      onDragStart={(e) => {
+        setDraggedStickyNote(note);
+        const dragEvent = e as DragEvent;
+        if (dragEvent.dataTransfer) {
+          dragEvent.dataTransfer.effectAllowed = "move";
+          dragEvent.dataTransfer.setData("text/plain", note.id.toString());
+        }
+        if (e.currentTarget) {
+          (e.currentTarget as HTMLElement).style.opacity = "0.5";
+        }
+      }}
+      onDragEnd={(e) => {
+        setDraggedStickyNote(null);
+        if (e.currentTarget) {
+          (e.currentTarget as HTMLElement).style.opacity = "1";
+        }
+      }}
     >
-      <Checkbox
-        id={`todo-${todo.id}`}
-        checked={todo.completed}
-        onCheckedChange={() => toggleTodo(todo.id)}
-      />
-      <label
-        htmlFor={`todo-${todo.id}`}
-        className={`ml-2 flex-grow ${todo.completed ? "line-through text-gray-500 dark:text-gray-400" : ""}`}
-      >
-        {todo.text}
-      </label>
-      <div className="flex items-center gap-2">
-        {categoryIcons[todo.category]}
-        <span className="text-sm text-gray-500 dark:text-gray-400">
-          {format(todo.date, "yyyy/MM/dd", { locale: ja })}
-        </span>
-        <Button variant="ghost" size="icon" onClick={() => editTodo(todo)}>
+      <h3 className="font-semibold mb-2">{note.title}</h3>
+      <div className="flex justify-end space-x-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => editStickyNote(note)}
+        >
           <Edit className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="icon" onClick={() => deleteTodo(todo.id)}>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => deleteStickyNote(note.id)}
+        >
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>
     </motion.div>
   );
 
-  const EventItem = ({ event }: { event: Event }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
-      className={`flex items-center p-2 rounded ${priorityColors[event.priority]} transition-colors duration-200`}
-    >
-      <div className="flex-grow">
-        <h4 className="font-semibold">{event.title}</h4>
-        {!event.isTask && (
-          <>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {event.description}
-            </p>
-            <div className="flex items-center gap-2 mt-1">
-              {categoryIcons[event.category]}
-              <span className="text-sm text-gray-500 dark:text-gray-400">
-                {format(event.start, "yyyy/MM/dd HH:mm", { locale: ja })} -{" "}
-                {format(event.end, "HH:mm", { locale: ja })}
-              </span>
-            </div>
-          </>
-        )}
-      </div>
-    </motion.div>
-  );
-
-  const filteredTodos = useMemo(() => {
-    return todos.filter(
-      (todo) =>
-        todo.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        format(todo.date, "yyyy/MM/dd").includes(searchTerm)
+  const filteredStickyNotes = useMemo(() => {
+    return stickyNotes.filter((note) =>
+      note.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [todos, searchTerm]);
-
-  const filteredEvents = useMemo(() => {
-    return events.filter(
-      (event) =>
-        event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        event.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        format(event.start, "yyyy/MM/dd").includes(searchTerm)
-    );
-  }, [events, searchTerm]);
-
-  const sortedTodos = useMemo(() => {
-    return [...filteredTodos].sort((a, b) => {
-      if (a.completed === b.completed) {
-        return b.date.getTime() - a.date.getTime();
-      }
-      return a.completed ? 1 : -1;
-    });
-  }, [filteredTodos]);
-
-  const sortedEvents = useMemo(() => {
-    return [...filteredEvents].sort(
-      (a, b) => b.start.getTime() - a.start.getTime()
-    );
-  }, [filteredEvents]);
-
-  const recentTodos = todos
-    .filter((todo) => isToday(todo.date) || isFuture(todo.date))
-    .sort((a, b) => a.date.getTime() - b.date.getTime())
-    .slice(0, 5);
+  }, [stickyNotes, searchTerm]);
 
   const handleStatusBarClick = () => {
     setModalState((prevState) => {
@@ -693,7 +558,7 @@ export default function Page() {
             <SheetTitle>設定</SheetTitle>
           </SheetHeader>
           <div className="mt-4 space-y-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center space-x-2">
               <Switch
                 id="dark-mode"
                 checked={isDarkMode}
@@ -731,102 +596,36 @@ export default function Page() {
 
         <div className="w-full lg:w-1/2 pl-2 bg-white dark:bg-gray-800 overflow-auto lg:block hidden">
           <h2 className="text-xl lg:text-2xl font-bold mb-4 dark:text-white">
-            TODO リスト
+            付箋
           </h2>
-          <div className="flex flex-col lg:flex-row mb-4 space-y-2 lg:space-y-0 lg:gap-2">
+          <div className="flex flex-col lg:flex-row mb-4 space-y-2 lg:space-y-0 lg:space-x-2">
             <Input
               type="text"
-              value={newTodo}
-              onChange={(e) => setNewTodo(e.target.value)}
-              placeholder="新しいタスクを入力"
+              value={newStickyNote}
+              onChange={(e) => setNewStickyNote(e.target.value)}
+              placeholder="タイトルを入力"
               className="flex-grow"
             />
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full lg:w-auto">
-                  {format(todoDate, "yyyy-MM-dd")}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={todoDate}
-                  onSelect={(date) => date && setTodoDate(date)}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
-            <Select
-              value={priority}
-              onValueChange={(value: Priority) => setPriority(value)}
-            >
-              <SelectTrigger className="w-full lg:w-[180px]">
-                <SelectValue placeholder="重要度を選択" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="low">低</SelectItem>
-                <SelectItem value="medium">中</SelectItem>
-                <SelectItem value="high">高</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select
-              value={category}
-              onValueChange={(value: Category) => setCategory(value)}
-            >
-              <SelectTrigger className="w-full lg:w-[180px]">
-                <SelectValue placeholder="カテゴリを選択" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="work">仕事</SelectItem>
-                <SelectItem value="personal">個人</SelectItem>
-                <SelectItem value="shopping">買い物</SelectItem>
-                <SelectItem value="health">健康</SelectItem>
-                <SelectItem value="other">その他</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button onClick={addTodo} className="w-full lg:w-auto">
+            <Button onClick={addStickyNote} className="w-full lg:w-auto">
               追加
             </Button>
           </div>
           <div className="mb-4">
             <Input
               type="text"
-              placeholder="タスクを検索..."
+              placeholder="付箋を検索..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full"
             />
           </div>
-          <AnimatePresence>
-            {sortedTodos.map((todo) => (
-              <TodoItem key={todo.id} todo={todo} />
-            ))}
-          </AnimatePresence>
-          <h3 className="text-lg font-semibold mt-8 mb-4 dark:text-white">
-            イベント
-          </h3>
-          <AnimatePresence>
-            {sortedEvents.map((event) => (
-              <EventItem key={event.id} event={event} />
-            ))}
-          </AnimatePresence>
-        </div>
-
-        <div className="mt-4 bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 lg:hidden">
-          <h3 className="text-lg font-semibold mb-2 dark:text-white">
-            直近のTODO
-          </h3>
-          {recentTodos.length > 0 ? (
-            <ul className="space-y-2">
-              {recentTodos.map((todo) => (
-                <li key={todo.id}>
-                  <TodoItem todo={todo} />
-                </li>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <AnimatePresence>
+              {filteredStickyNotes.map((note) => (
+                <StickyNoteItem key={note.id} note={note} />
               ))}
-            </ul>
-          ) : (
-            <p className="dark:text-gray-300">直近のTODOはありません。</p>
-          )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
 
@@ -907,11 +706,11 @@ export default function Page() {
               >
                 <ChevronUp className="h-6 w-6 text-gray-400 flex-shrink-0" />
                 <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
-                  {format(selectedDate, "yyyy年MM月dd日", { locale: ja })}のTODO
+                  {format(selectedDate, "yyyy年MM月dd日", { locale: ja })}の付箋
                 </span>
-                {selectedDateTodos.length > 0 && (
+                {filteredStickyNotes.length > 0 && (
                   <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
-                    （{selectedDateTodos.length}件）
+                    （{filteredStickyNotes.length}件）
                   </span>
                 )}
               </div>
@@ -922,7 +721,7 @@ export default function Page() {
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-semibold dark:text-white">
                     {format(selectedDate, "yyyy年MM月dd日", { locale: ja })}
-                    のTODO
+                    の付箋
                   </h3>
                   <Button
                     variant="ghost"
@@ -935,70 +734,23 @@ export default function Page() {
                 <div className="space-y-4">
                   <Input
                     type="text"
-                    value={newTodo}
-                    onChange={(e) => setNewTodo(e.target.value)}
-                    placeholder="新しいタスクを入力"
+                    value={newStickyNote}
+                    onChange={(e) => setNewStickyNote(e.target.value)}
+                    placeholder="新しい付箋のタイトルを入力"
                     className="w-full"
                   />
-                  <div className="flex gap-2">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-1/2">
-                          {format(todoDate, "yyyy-MM-dd")}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={todoDate}
-                          onSelect={(date) => date && setTodoDate(date)}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <Select
-                      value={priority}
-                      onValueChange={(value: Priority) => setPriority(value)}
-                    >
-                      <SelectTrigger className="w-1/2">
-                        <SelectValue placeholder="重要度" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="low">低</SelectItem>
-                        <SelectItem value="medium">中</SelectItem>
-                        <SelectItem value="high">高</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Select
-                    value={category}
-                    onValueChange={(value: Category) => setCategory(value)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="カテゴリを選択" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="work">仕事</SelectItem>
-                      <SelectItem value="personal">個人</SelectItem>
-                      <SelectItem value="shopping">買い物</SelectItem>
-                      <SelectItem value="health">健康</SelectItem>
-                      <SelectItem value="other">その他</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button onClick={addTodo} className="w-full">
+                  <Button onClick={addStickyNote} className="w-full">
                     追加
                   </Button>
-                  {selectedDateTodos.length > 0 ? (
-                    <ul className="space-y-2">
-                      {selectedDateTodos.map((todo) => (
-                        <li key={todo.id}>
-                          <TodoItem todo={todo} />
-                        </li>
+                  {filteredStickyNotes.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-4">
+                      {filteredStickyNotes.map((note) => (
+                        <StickyNoteItem key={note.id} note={note} />
                       ))}
-                    </ul>
+                    </div>
                   ) : (
                     <p className="dark:text-gray-300">
-                      この日のTODOはありません。
+                      この日の付箋はありません。
                     </p>
                   )}
                 </div>
@@ -1008,71 +760,32 @@ export default function Page() {
         )}
       </AnimatePresence>
 
-      <Dialog open={!!editingTodo} onOpenChange={() => setEditingTodo(null)}>
+      <Dialog
+        open={!!editingStickyNote}
+        onOpenChange={() => setEditingStickyNote(null)}
+      >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>タスクを編集</DialogTitle>
+            <DialogTitle>付箋を編集</DialogTitle>
           </DialogHeader>
-          {editingTodo && (
+          {editingStickyNote && (
             <div className="space-y-4">
               <Input
                 type="text"
-                value={editingTodo.text}
+                value={editingStickyNote.title}
                 onChange={(e) =>
-                  setEditingTodo({ ...editingTodo, text: e.target.value })
+                  setEditingStickyNote({
+                    ...editingStickyNote,
+                    title: e.target.value,
+                  })
                 }
-                placeholder="タスクを入力"
+                placeholder="タイトルを入力"
               />
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline">
-                    {format(editingTodo.date, "yyyy-MM-dd")}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={editingTodo.date}
-                    onSelect={(date) =>
-                      date && setEditingTodo({ ...editingTodo, date })
-                    }
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <Select
-                value={editingTodo.priority}
-                onValueChange={(value: Priority) =>
-                  setEditingTodo({ ...editingTodo, priority: value })
+              <Button
+                onClick={() =>
+                  editingStickyNote && updateStickyNote(editingStickyNote)
                 }
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="重要度を選択" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">低</SelectItem>
-                  <SelectItem value="medium">中</SelectItem>
-                  <SelectItem value="high">高</SelectItem>
-                </SelectContent>
-              </Select>
-              <Select
-                value={editingTodo.category}
-                onValueChange={(value: Category) =>
-                  setEditingTodo({ ...editingTodo, category: value })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="カテゴリを選択" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="work">仕事</SelectItem>
-                  <SelectItem value="personal">個人</SelectItem>
-                  <SelectItem value="shopping">買い物</SelectItem>
-                  <SelectItem value="health">健康</SelectItem>
-                  <SelectItem value="other">その他</SelectItem>
-                </SelectContent>
-              </Select>
-              <Button onClick={() => editingTodo && updateTodo(editingTodo)}>
                 更新
               </Button>
             </div>
@@ -1089,7 +802,14 @@ export default function Page() {
           </DialogHeader>
           <EventCreator
             onSave={addEvent}
-            onCancel={() => setIsEventModalOpen(false)}
+            onCancel={() => {
+              if (removedStickyNote) {
+                setStickyNotes([...stickyNotes, removedStickyNote]);
+                setRemovedStickyNote(null);
+              }
+              setIsEventModalOpen(false);
+            }}
+            initialTitle={draggedStickyNote ? draggedStickyNote.title : ""}
           />
         </DialogContent>
       </Dialog>
