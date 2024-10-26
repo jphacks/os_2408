@@ -1,3 +1,7 @@
+export interface WantTodo {
+  title: string;
+}
+
 export interface Event {
   title: string;
   description: string;
