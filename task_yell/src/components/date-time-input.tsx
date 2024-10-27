@@ -18,9 +18,17 @@ import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { useState } from "react";
 
-export function DateTimeInput({ className }: { className?: string }) {
-  const [date, setDate] = useState<Date | undefined>(new Date());
-  const [time, setTime] = useState("10:00");
+export function DateTimeInput({
+  className,
+  props,
+}: {
+  className?: string;
+  props: {
+    date: Date;
+  };
+}) {
+  const [date, setDate] = useState<Date | undefined>(props.date);
+  const [time, setTime] = useState(props.date.toLocaleTimeString());
 
   const timeOptions = Array.from({ length: 96 }, (_, i) => {
     const hours = Math.floor(i / 4)
