@@ -39,6 +39,7 @@ import {
   endOfMonth,
   endOfWeek,
   format,
+  getHours,
   isSameDay,
   isSameMonth,
   startOfMonth,
@@ -106,11 +107,13 @@ function EventCreator({
   onCancel,
   initialTitle = "",
   targetDate,
+  events
 }: {
   onSave: (event: Event) => void;
   onCancel: () => void;
   initialTitle?: string;
   targetDate: Date;
+  events: Event[];
 }) {
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState("");
@@ -143,24 +146,56 @@ function EventCreator({
     }
   };
 
+  // 選択された日のスケジュールを描画する関数
+  const renderDaySchedule = () => {
+    // 選択された日のイベントをフィルタリング
+    const dayEvents = events.filter(event => isSameDay(event.start, selectedDate))
+    const hours = Array.from({ length: 24 }, (_, i) => i)
+
+    const sortedEvents = dayEvents.sort((a, b) => a.start.getTime() - b.start.getTime())
+
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+        <h3 className="text-lg font-semibold mb-4">{format(selectedDate, 'yyyy年MM月dd日 (E)', { locale: ja })}のスケジュール</h3>
+        <div className="relative" style={{ height: '600px', overflowY: 'auto' }}>
+          {hours.map(hour => (
+            <div key={hour} className="flex items-center h-12 border-t border-gray-200 dark:border-gray-700">
+              <span className="w-12 text-xs text-gray-500">{`${hour.toString().padStart(2, '0')}:00`}</span>
+              <div className="flex-1 relative">
+                {sortedEvents
+                  .filter(event => getHours(event.start) === hour)
+                  .map((event, index) => {
+                    const startMinutes = event.start.getMinutes()
+                    const duration = (event.end.getTime() - event.start.getTime()) / (1000 * 60)
+                    const height = `${duration}px`
+                    const top = `${startMinutes}px`
+                    const width = index === 0 ? '200%' : '150%'
+                    const left = index === 0 ? '0%' : `${50 * Math.min(index, 3)}%`
+                    const zIndex = index + 1
+
+                    return (
+                      <div
+                        key={event.id}
+                        className={`absolute p-1 text-xs rounded-sm ${priorityColors[event.priority]} overflow-hidden border border-gray-300 dark:border-gray-600`}
+                        style={{ top, height, minHeight: '20px', width, left, zIndex }}
+                      >
+                        <div className="font-semibold truncate">{event.title}</div>
+                        <div className="truncate">{`${format(event.start, 'HH:mm')} - ${format(event.end, 'HH:mm')}`}</div>
+                      </div>
+                    )
+                  })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex space-x-4">
       <div className="w-2/5">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-2">
-          <h3 className="text-sm font-semibold mb-2">
-            {format(targetDate || new Date(), "yyyy年MM月dd日 (E)", {
-              locale: ja,
-            })}
-          </h3>
-          <div className="space-y-1">
-            {Array.from({ length: 24 }).map((_, hour) => (
-              <div key={hour} className="flex items-center">
-                <span className="w-8 text-xs text-gray-500">{`${hour.toString().padStart(2, "0")}:00`}</span>
-                <div className="flex-1 h-4 border-t border-gray-200 dark:border-gray-700"></div>
-              </div>
-            ))}
-          </div>
-        </div>
+        {renderDaySchedule()}
       </div>
       <div className="w-3/5 space-y-3">
         <div className="flex items-center space-x-2">
@@ -432,11 +467,10 @@ export default function Home() {
                 return (
                   <motion.div
                     key={day.toISOString()}
-                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${
-                      !isCurrentMonth
+                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${!isCurrentMonth
                         ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
                         : ""
-                    } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
+                      } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
                     onClick={() => handleDateSelect(day)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -855,6 +889,7 @@ export default function Home() {
             </DialogTitle>
           </DialogHeader>
           <EventCreator
+            events={events}
             onSave={addEvent}
             onCancel={() => {
               if (removedStickyNote) {
