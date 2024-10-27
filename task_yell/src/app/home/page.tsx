@@ -29,7 +29,6 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { signOut } from "@/firebase/auth";
 import { auth, db } from "@/firebase/client-app";
-import { splitWantToDo } from "@/lib/ai";
 import { createEvent, readEvents } from "@/lib/events";
 import { createNotification } from "@/lib/notifications";
 import { subscribeNotification } from "@/lib/push-notification";
