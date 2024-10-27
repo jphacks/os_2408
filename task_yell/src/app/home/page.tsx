@@ -58,8 +58,6 @@ import {
 } from "date-fns";
 import { ja } from "date-fns/locale";
 import {
-  addDoc,
-  collection,
   doc,
   getDoc,
   setDoc,
