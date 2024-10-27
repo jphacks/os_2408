@@ -16,20 +16,17 @@ import { CalendarIcon } from "@radix-ui/react-icons";
 
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
-import { useState } from "react";
+import { useMemo } from "react";
 
 export function DateTimeInput({
   className,
-  props,
+  date,
+  onChanged
 }: {
   className?: string;
-  props: {
-    date: Date;
-  };
+  date: Date;
+  onChanged: (date: Date) => void;
 }) {
-  const [date, setDate] = useState<Date | undefined>(props.date);
-  const [time, setTime] = useState(props.date.toLocaleTimeString());
-
   const timeOptions = Array.from({ length: 96 }, (_, i) => {
     const hours = Math.floor(i / 4)
       .toString()
@@ -37,7 +34,10 @@ export function DateTimeInput({
     const minutes = ((i % 4) * 15).toString().padStart(2, "0");
     return `${hours}:${minutes}`;
   });
-  const handleTimeChange = (time: string) => setTime(time);
+  const time = useMemo(() => {
+    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  }, [date]);
+
 
   return (
     <div className={`flex flex-row ${className}`}>
@@ -56,14 +56,28 @@ export function DateTimeInput({
               <Calendar
                 mode="single"
                 selected={date ?? undefined}
-                onSelect={(day) => setDate(day ?? undefined)}
+                onSelect={(day) => {
+                  // Dateの日付部分だけ変更
+                  if (!day) return;
+                  const newDate = new Date(date);
+                  newDate.setFullYear(day.getFullYear());
+                  newDate.setMonth(day.getMonth());
+                  newDate.setDate(day.getDate());
+                  onChanged(newDate);
+                }}
                 initialFocus
               />
             </PopoverContent>
           </Popover>
           <Select
             value={time}
-            onValueChange={(value) => handleTimeChange(value)}
+            onValueChange={(value) => {
+              const [hours, minutes] = value.split(":").map(Number);
+              const newDate = new Date(date);
+              newDate.setHours(hours);
+              newDate.setMinutes(minutes);
+              onChanged(newDate);
+            }}
           >
             <SelectTrigger className="flex-grow">
               <SelectValue placeholder="開始時間" />

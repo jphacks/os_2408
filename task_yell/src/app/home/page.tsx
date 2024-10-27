@@ -117,9 +117,8 @@ function EventCreator({
 }) {
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState("");
-  const [selectedDate] = useState<Date>(targetDate);
-  const [startTime] = useState("10:00");
-  const [endTime] = useState("11:00");
+  const [startTime, setStartTime] = useState(targetDate);
+  const [endTime, setEndTime] = useState(targetDate);
   const [location, setLocation] = useState("");
   const [invitees, setInvitees] = useState("");
   const [category, setCategory] = useState<Category>("other");
@@ -132,8 +131,8 @@ function EventCreator({
       const newEvent: Event = {
         id: Date.now(),
         title,
-        start: new Date(`${format(selectedDate, "yyyy-MM-dd")}T${startTime}`),
-        end: new Date(`${format(selectedDate, "yyyy-MM-dd")}T${endTime}`),
+        start: startTime,
+        end: endTime,
         description,
         category,
         priority,
@@ -150,7 +149,7 @@ function EventCreator({
   const renderDaySchedule = () => {
     // 選択された日のイベントをフィルタリング
     const dayEvents = events.filter((event) =>
-      isSameDay(event.start, selectedDate),
+      isSameDay(event.start, startTime),
     );
     const hours = Array.from({ length: 24 }, (_, i) => i);
 
@@ -161,7 +160,7 @@ function EventCreator({
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
         <h3 className="text-lg font-semibold mb-4">
-          {format(selectedDate, "yyyy年MM月dd日 (E)", { locale: ja })}
+          {format(startTime, "yyyy年MM月dd日 (E)", { locale: ja })}
           のスケジュール
         </h3>
         <div
@@ -239,11 +238,22 @@ function EventCreator({
         </div>
 
         {isTask ? (
-          <DateTimeInput className="w-full" props={{ date: targetDate }} />
+          <DateTimeInput className="w-full"
+            date={startTime}
+            onChanged={(date) => setStartTime(date)}
+          />
         ) : (
           <div className="flex flex-col gap-2">
-            <DateTimeInput className="w-full" props={{ date: targetDate }} />
-            <DateTimeInput className="w-full" props={{ date: targetDate }} />
+            <DateTimeInput
+              className="w-full"
+              date={startTime}
+              onChanged={(date) => setStartTime(date)}
+            />
+            <DateTimeInput
+              className="w-full"
+              date={endTime}
+                onChanged={(date) => setEndTime(date)}
+            />
           </div>
         )}
 
@@ -490,11 +500,10 @@ export default function Home() {
                 return (
                   <motion.div
                     key={day.toISOString()}
-                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${
-                      !isCurrentMonth
-                        ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
-                        : ""
-                    } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
+                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${!isCurrentMonth
+                      ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
+                      : ""
+                      } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
                     onClick={() => handleDateSelect(day)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
