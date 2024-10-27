@@ -24,7 +24,7 @@ export async function createData<T extends WithFieldValue<DocumentData>>(
 
 export async function readData<T>(collectionName: string): Promise<T[]> {
   const snapshot = await getDocs(collection(db, collectionName));
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as T);
+  return snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }) as T);
 }
 
 export async function readSingleData<T>(
