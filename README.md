@@ -21,7 +21,9 @@ wanTODO は、日常で思いついた時にメモを残しておくことで、
 <!--さらに、重要度によって、ユーザーへの通知の仕方も工夫した。重要度が低い予定やタスクは、低頻度のデスクトップ通知を行う。重要度が高くなるにつれて、通知の頻度が高くなっていく。重要度が最高レベルのものには、スマートフォンへ電話をかけることで、無視できない通知をすることにした。-->
 
 また、この作品は Vercel にてデプロイを行った。リンクは[こちら](https://taskyell.vercel.app/)
-![image](https://github.com/user-attachments/assets/c0b244e6-fa96-48f0-a46d-b27eddfc2b23)
+
+
+<img src="https://github.com/user-attachments/assets/c0b244e6-fa96-48f0-a46d-b27eddfc2b23" width="200" height="200">
 
 
 ### 特長
