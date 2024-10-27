@@ -2,6 +2,7 @@
 import { google, calendar_v3 } from "googleapis";
 import { type NextRequest } from "next/server";
 import { firebaseAdminApp } from "@/firebase/server-app";
+import { redirect } from "next/navigation";
 
 function createOAuth2Client() {
   return new google.auth.OAuth2(
@@ -79,4 +80,6 @@ export async function GET(req: NextRequest) {
   for (const event of events) {
     await ref.add(event);
   }
+
+  redirect("/home");
 }
