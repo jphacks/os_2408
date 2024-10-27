@@ -1,3 +1,4 @@
+import { Timestamp } from "firebase/firestore";
 import {
   createData,
   deleteData,
@@ -41,7 +42,12 @@ export async function createEvent(
 }
 
 export async function readEvents(userId: string): Promise<Event[]> {
-  return readData<Event>(`users/${userId}/${COLLECTION_NAME}`);
+  return (await readData<Event>(`users/${userId}/${COLLECTION_NAME}`))
+    .map((event) => ({
+      ...event,
+      start: event.start ? (event.start as unknown as Timestamp).toDate() : null,
+      end: event.end ? (event.end as unknown as Timestamp).toDate() : null,
+    }));
 }
 
 export async function readSingleEvent(
