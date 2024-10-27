@@ -26,7 +26,10 @@ export async function createTask(userId: string, task: Task): Promise<void> {
  */
 export async function readTasks(userId: string): Promise<Task[]> {
   return readData<Task>(`users/${userId}/${COLLECTION_NAME}`).then((tasks) =>
-    tasks.map((task) => ({ ...task, due: (task.due as unknown as Timestamp).toDate() })),
+    tasks.map((task) => ({
+      ...task,
+      due: (task.due as unknown as Timestamp).toDate(),
+    })),
   );
 }
 
@@ -40,8 +43,9 @@ export async function readSingleTask(
   userId: string,
   id: string,
 ): Promise<Task | null> {
-  return readSingleData<Task>(`users/${userId}/${COLLECTION_NAME}`, id).then((task) =>
-    task && ({ ...task, due: (task.due as unknown as Timestamp).toDate() }),
+  return readSingleData<Task>(`users/${userId}/${COLLECTION_NAME}`, id).then(
+    (task) =>
+      task && { ...task, due: (task.due as unknown as Timestamp).toDate() },
   );
 }
 

@@ -16,20 +16,24 @@ export async function createNotification(
 }
 
 export async function readNotification(): Promise<Notification[]> {
-  return (await readData<Notification>(COLLECTION_NAME))
-    .map((notification) => ({
+  return (await readData<Notification>(COLLECTION_NAME)).map(
+    (notification) => ({
       ...notification,
       datetime: (notification.datetime as unknown as Timestamp).toDate(),
-    }));
+    }),
+  );
 }
 
 export async function readSingleNotification(
   id: string,
 ): Promise<Notification | null> {
-  return readSingleData<Notification>(COLLECTION_NAME, id).then((notification) => notification && ({
-    ...notification,
-    datetime: (notification.datetime as unknown as Timestamp).toDate(),
-  }));
+  return readSingleData<Notification>(COLLECTION_NAME, id).then(
+    (notification) =>
+      notification && {
+        ...notification,
+        datetime: (notification.datetime as unknown as Timestamp).toDate(),
+      },
+  );
 }
 
 export async function updateNotification(

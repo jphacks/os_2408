@@ -42,12 +42,15 @@ export async function createEvent(
 }
 
 export async function readEvents(userId: string): Promise<Event[]> {
-  return (await readData<Event>(`users/${userId}/${COLLECTION_NAME}`))
-    .map((event) => ({
+  return (await readData<Event>(`users/${userId}/${COLLECTION_NAME}`)).map(
+    (event) => ({
       ...event,
-      start: event.start ? (event.start as unknown as Timestamp).toDate() : null,
+      start: event.start
+        ? (event.start as unknown as Timestamp).toDate()
+        : null,
       end: event.end ? (event.end as unknown as Timestamp).toDate() : null,
-    }));
+    }),
+  );
 }
 
 export async function readSingleEvent(
