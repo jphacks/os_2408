@@ -27,9 +27,11 @@ import {
 } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { signOut } from "@/firebase/auth";
 import { auth } from "@/firebase/client-app";
-import { readEvents } from "@/lib/events";
+import { createEvent, readEvents } from "@/lib/events";
 import { Category, Priority } from "@/lib/types";
+import { createWantTodo, deleteWantTodo, readWantTodos, updateWantTodo } from "@/lib/want-todo";
 import {
   AngleIcon,
   ListBulletIcon,
@@ -389,6 +391,15 @@ export default function Home() {
             };
           }));
         });
+
+        readWantTodos(auth.currentUser.uid).then((todos) => {
+          setStickyNotes(todos.map((todo) => {
+            return {
+              id: todo.id,
+              title: todo.title,
+            };
+          }));
+        });
       }
     });
   }, [router]);
@@ -408,26 +419,38 @@ export default function Home() {
     {
       icon: Bell,
       label: "通知",
-      onClick: () => setIsNotificationsOpen(!isNotificationsOpen),
+      onClick: () => {
+        return setIsNotificationsOpen(!isNotificationsOpen);
+      },
     },
     { icon: Users, label: "友達", onClick: () => console.log("友達") },
     {
       icon: Download,
       label: "インポート",
-      onClick: () => console.log("インポート"),
+      onClick: () => {
+        if (auth.currentUser) {
+          router.push(`/api/auth/google-cal?userId=${encodeURIComponent(auth.currentUser.uid)}`)
+        }
+      },
     },
     {
       icon: LogOut,
       label: "ログアウト",
-      onClick: () => console.log("ログアウト"),
+      onClick: async () => {
+        await signOut();
+        router.refresh();
+      },
     },
   ];
 
-  const addStickyNote = () => {
+  const addStickyNote = async () => {
     if (newStickyNote.trim()) {
       const newNote: StickyNote = { id: "", title: newStickyNote };
       setStickyNotes([...stickyNotes, newNote]);
       setNewStickyNote("");
+      if (auth.currentUser) {
+        await createWantTodo(auth.currentUser.uid, newNote);
+      }
     }
   };
 
@@ -435,15 +458,20 @@ export default function Home() {
     setEditingStickyNote(note);
   };
 
-  const updateStickyNote = (updatedNote: StickyNote) => {
+  const updateStickyNote = async (updatedNote: StickyNote) => {
     const updatedNotes = stickyNotes.map((note) =>
       note.id === updatedNote.id ? updatedNote : note,
     );
     setStickyNotes(updatedNotes);
     setEditingStickyNote(null);
+    if (auth.currentUser) {
+      await updateWantTodo(auth.currentUser.uid, updatedNote.id, {
+        title: updatedNote.title,
+      })
+    }
   };
 
-  const deleteStickyNote = (id: string) => {
+  const deleteStickyNote = async (id: string) => {
     const noteToRemove = stickyNotes.find((note) => note.id === id);
     if (noteToRemove) {
       setRemovedStickyNote(noteToRemove);
@@ -452,12 +480,24 @@ export default function Home() {
     if (draggedStickyNote && draggedStickyNote.id === id) {
       setDraggedStickyNote(null);
     }
+    if (auth.currentUser) {
+      await deleteWantTodo(auth.currentUser.uid, id);
+    }
   };
 
-  const addEvent = (newEvent: Event) => {
+  const addEvent = async (newEvent: Event) => {
     setEvents([...events, newEvent]);
     setIsEventModalOpen(false);
     setRemovedStickyNote(null);
+    if (auth.currentUser) {
+      await createEvent(auth.currentUser.uid, {
+        ...newEvent,
+        attendees: newEvent.invitees.split(",").map((invitee) => invitee.trim()),
+        category: newEvent.category,
+        priority: newEvent.priority,
+        reccurence: []
+      });
+    }
   };
 
   const getDaysInMonth = (date: Date) => {

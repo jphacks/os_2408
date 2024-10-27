@@ -33,7 +33,7 @@ export async function readSingleData<T>(
 ): Promise<T | null> {
   const docRef = doc(db, collectionName, id);
   const snapshot = await getDoc(docRef);
-  return snapshot.exists() ? (snapshot.data() as T) : null;
+  return snapshot.exists() ? { ...(snapshot.data() as T), id: id } : null;
 }
 
 export async function updateData<T>(
