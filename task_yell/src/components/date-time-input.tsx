@@ -21,7 +21,7 @@ import { useMemo } from "react";
 export function DateTimeInput({
   className,
   date,
-  onChanged
+  onChanged,
 }: {
   className?: string;
   date: Date;
@@ -35,9 +35,8 @@ export function DateTimeInput({
     return `${hours}:${minutes}`;
   });
   const time = useMemo(() => {
-    return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+    return `${date.getHours().toString().padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}`;
   }, [date]);
-
 
   return (
     <div className={`flex flex-row ${className}`}>

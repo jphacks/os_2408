@@ -238,7 +238,8 @@ function EventCreator({
         </div>
 
         {isTask ? (
-          <DateTimeInput className="w-full"
+          <DateTimeInput
+            className="w-full"
             date={startTime}
             onChanged={(date) => setStartTime(date)}
           />
@@ -252,7 +253,7 @@ function EventCreator({
             <DateTimeInput
               className="w-full"
               date={endTime}
-                onChanged={(date) => setEndTime(date)}
+              onChanged={(date) => setEndTime(date)}
             />
           </div>
         )}
@@ -500,10 +501,11 @@ export default function Home() {
                 return (
                   <motion.div
                     key={day.toISOString()}
-                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${!isCurrentMonth
-                      ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
-                      : ""
-                      } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
+                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${
+                      !isCurrentMonth
+                        ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
+                        : ""
+                    } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
                     onClick={() => handleDateSelect(day)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
