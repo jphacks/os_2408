@@ -16,8 +16,8 @@ const COLLECTION_NAME = "want-todos";
 export async function createWantTodo(
   userId: string,
   wantTodo: WantTodo,
-): Promise<void> {
-  await createData<WantTodo>(`users/${userId}/${COLLECTION_NAME}`, wantTodo);
+): Promise<string> {
+  return await createData<WantTodo>(`users/${userId}/${COLLECTION_NAME}`, wantTodo);
 }
 
 /**
