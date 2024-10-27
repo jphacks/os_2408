@@ -20,6 +20,7 @@
 #### 使用方法　
 
 - 右の画面から、**wanTODO**を作成できる。
+
   wanTODO とは日常で思いついたことをメモとして残しておくことでき、予定やタスクの少ない日にカレンダーに設定することができる特徴をもつ。
   wanTODO は簡単に予定やタスクとして確定でき、日付が近くなると通知される。
 
@@ -33,6 +34,7 @@
 #### リンク類
 
 より詳しい使い方等はこちらの[スライド動画](https://www.canva.com/design/DAGUu4UAsF0/IUgaJr0LKjhkuwHdAF52Qw/watch?utm_content=DAGUu4UAsF0&utm_campaign=designshare&utm_medium=link&utm_source=editor)から
+
 実際の使用感はこちらの[デプロイ先](https://taskyell.vercel.app/)から
 
 <img src="https://github.com/user-attachments/assets/c0b244e6-fa96-48f0-a46d-b27eddfc2b23" width="200" height="200">
