@@ -917,7 +917,7 @@ export default function Home() {
 
         <div className="w-full lg:w-1/2 pl-2 bg-white dark:bg-gray-800 overflow-auto lg:block hidden">
           <h2 className="text-xl lg:text-2xl font-bold mb-4 dark:text-white">
-            WanTODO
+            wanTODO
           </h2>
           <div className="flex flex-col lg:flex-row mb-4 space-y-2 lg:space-y-0 lg:space-x-2">
             <Input
@@ -934,7 +934,7 @@ export default function Home() {
           <div className="mb-4">
             <Input
               type="text"
-              placeholder="WanTODOを検索..."
+              placeholder="wanTODOを検索..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full"
@@ -1028,7 +1028,7 @@ export default function Home() {
                 <ChevronUp className="h-6 w-6 text-gray-400 flex-shrink-0" />
                 <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
                   {format(selectedDate, "yyyy年MM月dd日", { locale: ja })}
-                  のWanTODO
+                  のwanTODO
                 </span>
                 {filteredStickyNotes.length > 0 && (
                   <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
@@ -1043,7 +1043,7 @@ export default function Home() {
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-semibold dark:text-white">
                     {format(selectedDate, "yyyy年MM月dd日", { locale: ja })}
-                    のWanTODO
+                    のwanTODO
                   </h3>
                   <Button
                     variant="ghost"
@@ -1058,7 +1058,7 @@ export default function Home() {
                     type="text"
                     value={newStickyNote}
                     onChange={(e) => setNewStickyNote(e.target.value)}
-                    placeholder="新しいWanTODOのタイトルを入力"
+                    placeholder="新しいwanTODOのタイトルを入力"
                     className="w-full"
                   />
                   <Button onClick={addStickyNote} className="w-full">
@@ -1072,7 +1072,7 @@ export default function Home() {
                     </div>
                   ) : (
                     <p className="dark:text-gray-300">
-                      この日のWanTODOはありません。
+                      この日のwanTODOはありません。
                     </p>
                   )}
                 </div>
@@ -1088,7 +1088,7 @@ export default function Home() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>WanTODOを編集</DialogTitle>
+            <DialogTitle>wanTODOを編集</DialogTitle>
           </DialogHeader>
           {editingStickyNote && (
             <div className="space-y-4">
