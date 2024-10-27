@@ -54,7 +54,7 @@ export function DateTimeInput({ className }: { className?: string }) {
             </PopoverContent>
           </Popover>
           <Select
-            value={"startTime"}
+            value={time}
             onValueChange={(value) => handleTimeChange(value)}
           >
             <SelectTrigger className="flex-grow">
