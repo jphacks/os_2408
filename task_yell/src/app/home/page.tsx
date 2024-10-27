@@ -30,6 +30,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { signOut } from "@/firebase/auth";
 import { auth, db } from "@/firebase/client-app";
 import { createEvent, readEvents } from "@/lib/events";
+import { createNotification } from "@/lib/notifications";
+import { subscribeNotification } from "@/lib/push-notification";
 import { Category, Priority } from "@/lib/types";
 import {
   createWantTodo,
@@ -78,6 +80,7 @@ import {
   Users,
   Download,
   LogOut,
+  PhoneCall,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -123,7 +126,7 @@ function EventCreator({
   targetDate,
   events,
 }: {
-  onSave: (event: Event) => void;
+  onSave: (event: Event, notification: { date: Date | null, type: "call" | "push" }) => void;
   onCancel: () => void;
   initialTitle?: string;
   targetDate: Date;
@@ -139,6 +142,8 @@ function EventCreator({
   const [priority, setPriority] = useState<Priority>("medium");
   const [isTask, setIsTask] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
+  const [notificationDate, setNotificationDate] = useState<Date | null>(null);
+  const [notificationType, setNotificationType] = useState<"call" | "push">("call");
 
   const handleSave = () => {
     if (targetDate) {
@@ -155,7 +160,7 @@ function EventCreator({
         isTask,
         isLocked,
       };
-      onSave(newEvent);
+      onSave(newEvent, { date: notificationDate, type: notificationType });
     }
   };
 
@@ -344,6 +349,41 @@ function EventCreator({
           />
           <Label htmlFor="is-locked">ロックする</Label>
         </div>
+        {notificationDate && (
+          <>
+            <div className="flex flex-row gap-2 items-center">
+              <DateTimeInput
+                className="w-full"
+                date={notificationDate}
+                onChanged={(date) => setNotificationDate(date)}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <Checkbox
+                id="notification-type"
+                checked={notificationType === "call"}
+                onCheckedChange={(checked) => {
+                  setNotificationType(checked ? "call" : "push");
+                }}
+              />
+              <Label htmlFor="notification-type">電話で通知</Label>
+            </div>
+          </>
+        )}
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="notification-enabled"
+            checked={notificationDate !== null}
+            onCheckedChange={(checked) => {
+              if (checked) {
+                setNotificationDate(startTime);
+              } else {
+                setNotificationDate(null);
+              }
+            }}
+          />
+          <Label htmlFor="notification-enabled">通知を有効化</Label>
+        </div>
 
         <div className="flex justify-end space-x-2">
           <Button variant="outline" onClick={onCancel}>
@@ -434,10 +474,17 @@ export default function Home() {
    */
   const menuItems = [
     {
-      icon: Bell,
-      label: "通知",
+      icon: PhoneCall,
+      label: "電話通知",
       onClick: () => {
         return setIsNotificationsOpen(!isNotificationsOpen);
+      },
+    },
+    {
+      icon: Bell,
+      label: "プッシュ通知",
+      onClick: async () => {
+        await subscribeNotification();
       },
     },
     { icon: Users, label: "友達", onClick: () => console.log("友達") },
@@ -504,12 +551,12 @@ export default function Home() {
     }
   };
 
-  const addEvent = async (newEvent: Event) => {
+  const addEvent = async (newEvent: Event, notification: { date: Date | null, type: "call" | "push" }) => {
     setEvents([...events, newEvent]);
     setIsEventModalOpen(false);
     setRemovedStickyNote(null);
     if (auth.currentUser) {
-      await createEvent(auth.currentUser.uid, {
+      const id = await createEvent(auth.currentUser.uid, {
         ...newEvent,
         attendees: newEvent.invitees
           .split(",")
@@ -518,6 +565,15 @@ export default function Home() {
         priority: newEvent.priority,
         reccurence: [],
       });
+      if (notification.date) {
+        await createNotification({
+          id: "",
+          userId: auth.currentUser.uid,
+          eventOrTaskRef: `users/${auth.currentUser.uid}/events/${id}`,
+          datetime: notification.date,
+          type: notification.type,
+        });
+      }
     }
   };
 
@@ -592,11 +648,10 @@ export default function Home() {
                 return (
                   <motion.div
                     key={day.toISOString()}
-                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${
-                      !isCurrentMonth
-                        ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
-                        : ""
-                    } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
+                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${!isCurrentMonth
+                      ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
+                      : ""
+                      } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
                     onClick={() => handleDateSelect(day)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
