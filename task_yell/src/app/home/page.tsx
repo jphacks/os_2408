@@ -279,15 +279,15 @@ export default function Home() {
   >("partial");
   const [searchTerm, setSearchTerm] = useState("");
   const [editingStickyNote, setEditingStickyNote] = useState<StickyNote | null>(
-    null,
+    null
   );
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [draggedStickyNote, setDraggedStickyNote] = useState<StickyNote | null>(
-    null,
+    null
   );
   const [removedStickyNote, setRemovedStickyNote] = useState<StickyNote | null>(
-    null,
+    null
   );
   const dragControls = useDragControls();
   const modalRef = useRef<HTMLDivElement>(null);
@@ -314,7 +314,7 @@ export default function Home() {
 
   const updateStickyNote = (updatedNote: StickyNote) => {
     const updatedNotes = stickyNotes.map((note) =>
-      note.id === updatedNote.id ? updatedNote : note,
+      note.id === updatedNote.id ? updatedNote : note
     );
     setStickyNotes(updatedNotes);
     setEditingStickyNote(null);
@@ -380,8 +380,8 @@ export default function Home() {
           const weekDays = days.slice(weekIndex * 7, (weekIndex + 1) * 7);
           const maxEventsInWeek = Math.max(
             ...weekDays.map(
-              (day) => getTodoCountForDay(day) + getEventCountForDay(day),
-            ),
+              (day) => getTodoCountForDay(day) + getEventCountForDay(day)
+            )
           );
           const weekHeight =
             maxEventsInWeek > 2 ? Math.min(maxEventsInWeek * 20, 100) : "auto";
@@ -419,20 +419,20 @@ export default function Home() {
                       e.preventDefault();
                       e.currentTarget.classList.add(
                         "bg-blue-100",
-                        "dark:bg-blue-800",
+                        "dark:bg-blue-800"
                       );
                     }}
                     onDragLeave={(e) => {
                       e.currentTarget.classList.remove(
                         "bg-blue-100",
-                        "dark:bg-blue-800",
+                        "dark:bg-blue-800"
                       );
                     }}
                     onDrop={(e) => {
                       e.preventDefault();
                       e.currentTarget.classList.remove(
                         "bg-blue-100",
-                        "dark:bg-blue-800",
+                        "dark:bg-blue-800"
                       );
                       if (draggedStickyNote) {
                         handleDateSelect(day);
@@ -526,7 +526,7 @@ export default function Home() {
 
   const filteredStickyNotes = useMemo(() => {
     return stickyNotes.filter((note) =>
-      note.title.toLowerCase().includes(searchTerm.toLowerCase()),
+      note.title.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [stickyNotes, searchTerm]);
 
