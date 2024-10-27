@@ -846,7 +846,7 @@ export default function Home() {
                     <item.icon className="mr-2 h-5 w-5" />
                     {item.label}
                   </Button>
-                  {item.label === "通知" && isNotificationsOpen && (
+                  {item.label === "電話通知" && isNotificationsOpen && (
                     <form
                       className="ml-7 mt-2 space-y-4"
                       action={async (data) => {
