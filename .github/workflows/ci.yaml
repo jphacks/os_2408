@@ -34,7 +34,6 @@ jobs:
         run: npm run format:check
 
   preview:
-    needs: lint
     if: ${{ github.ref != 'refs/heads/main' }}
     runs-on: ubuntu-latest
     environment:
@@ -70,7 +69,6 @@ jobs:
         run: vercel alias ${{ steps.deploy.outputs.url }} stg.my-service.com --scope=my-team --token=${{ secrets.VERCEL_TOKEN }}
 
   prod:
-    needs: lint
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     defaults:
