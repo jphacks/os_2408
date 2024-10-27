@@ -60,12 +60,7 @@ import {
   subMonths,
 } from "date-fns";
 import { ja } from "date-fns/locale";
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { AnimatePresence, motion, useDragControls } from "framer-motion";
 import {
   ChevronLeft,
@@ -129,7 +124,10 @@ function EventCreator({
   targetDate,
   events,
 }: {
-  onSave: (event: Event, notification: { date: Date | null, type: "call" | "push" }) => void;
+  onSave: (
+    event: Event,
+    notification: { date: Date | null; type: "call" | "push" },
+  ) => void;
   onCancel: () => void;
   initialTitle?: string;
   targetDate: Date;
@@ -146,7 +144,9 @@ function EventCreator({
   const [isTask, setIsTask] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [notificationDate, setNotificationDate] = useState<Date | null>(null);
-  const [notificationType, setNotificationType] = useState<"call" | "push">("call");
+  const [notificationType, setNotificationType] = useState<"call" | "push">(
+    "call",
+  );
 
   const handleSave = () => {
     if (targetDate) {
@@ -534,7 +534,10 @@ export default function Home() {
       // Firestoreに追加
       if (generated) {
         const items = await Promise.all(
-          generated.map(async (item) => ({ id: await createWantTodo(uid, item), title: item.title })),
+          generated.map(async (item) => ({
+            id: await createWantTodo(uid, item),
+            title: item.title,
+          })),
         );
         setStickyNotes([...stickyNotes, ...items]);
       }
@@ -568,7 +571,10 @@ export default function Home() {
     }
   };
 
-  const addEvent = async (newEvent: Event, notification: { date: Date | null, type: "call" | "push" }) => {
+  const addEvent = async (
+    newEvent: Event,
+    notification: { date: Date | null; type: "call" | "push" },
+  ) => {
     setEvents([...events, newEvent]);
     setIsEventModalOpen(false);
     setRemovedStickyNote(null);
@@ -665,10 +671,11 @@ export default function Home() {
                 return (
                   <motion.div
                     key={day.toISOString()}
-                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${!isCurrentMonth
-                      ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
-                      : ""
-                      } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
+                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${
+                      !isCurrentMonth
+                        ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
+                        : ""
+                    } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
                     onClick={() => handleDateSelect(day)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -1021,7 +1028,8 @@ export default function Home() {
               >
                 <ChevronUp className="h-6 w-6 text-gray-400 flex-shrink-0" />
                 <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
-                  {format(selectedDate, "yyyy年MM月dd日", { locale: ja })}のWanTODO
+                  {format(selectedDate, "yyyy年MM月dd日", { locale: ja })}
+                  のWanTODO
                 </span>
                 {filteredStickyNotes.length > 0 && (
                   <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">

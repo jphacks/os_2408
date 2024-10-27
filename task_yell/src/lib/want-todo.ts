@@ -17,7 +17,10 @@ export async function createWantTodo(
   userId: string,
   wantTodo: WantTodo,
 ): Promise<string> {
-  return await createData<WantTodo>(`users/${userId}/${COLLECTION_NAME}`, wantTodo);
+  return await createData<WantTodo>(
+    `users/${userId}/${COLLECTION_NAME}`,
+    wantTodo,
+  );
 }
 
 /**
