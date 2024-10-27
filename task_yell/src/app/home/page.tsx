@@ -79,14 +79,11 @@ type Todo = {
 type Event = {
   id: number;
   title: string;
-  description: string;
-  date: Date;
-  startTime: string;
-  endTime: string;
-  category: Category;
-  priority: Priority;
   start: Date;
   end: Date;
+  description: string;
+  category: Category;
+  priority: Priority;
   location: string;
   invitees: string;
   isTask: boolean;
@@ -108,14 +105,16 @@ function EventCreator({
   onSave,
   onCancel,
   initialTitle = "",
+  targetDate,
 }: {
   onSave: (event: Event) => void;
   onCancel: () => void;
   initialTitle?: string;
+  targetDate: Date;
 }) {
   const [title, setTitle] = useState(initialTitle);
   const [description, setDescription] = useState("");
-  const [date] = useState<Date | undefined>(new Date());
+  const [selectedDate] = useState<Date>(targetDate);
   const [startTime] = useState("10:00");
   const [endTime] = useState("11:00");
   const [location, setLocation] = useState("");
@@ -126,18 +125,15 @@ function EventCreator({
   const [isLocked, setIsLocked] = useState(false);
 
   const handleSave = () => {
-    if (date) {
+    if (targetDate) {
       const newEvent: Event = {
         id: Date.now(),
         title,
+        start: new Date(`${format(selectedDate, "yyyy-MM-dd")}T${startTime}`),
+        end: new Date(`${format(selectedDate, "yyyy-MM-dd")}T${endTime}`),
         description,
-        date,
-        startTime,
-        endTime,
         category,
         priority,
-        start: new Date(`${format(date, "yyyy-MM-dd")}T${startTime}`),
-        end: new Date(`${format(date, "yyyy-MM-dd")}T${endTime}`),
         location,
         invitees,
         isTask,
@@ -152,7 +148,9 @@ function EventCreator({
       <div className="w-2/5">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-2">
           <h3 className="text-sm font-semibold mb-2">
-            {format(date || new Date(), "yyyy年MM月dd日 (E)", { locale: ja })}
+            {format(targetDate || new Date(), "yyyy年MM月dd日 (E)", {
+              locale: ja,
+            })}
           </h3>
           <div className="space-y-1">
             {Array.from({ length: 24 }).map((_, hour) => (
@@ -183,11 +181,11 @@ function EventCreator({
         </div>
 
         {isTask ? (
-          <DateTimeInput className="w-full" />
+          <DateTimeInput className="w-full" props={{ date: targetDate }} />
         ) : (
           <div className="flex flex-col gap-2">
-            <DateTimeInput className="w-full" />
-            <DateTimeInput className="w-full" />
+            <DateTimeInput className="w-full" props={{ date: targetDate }} />
+            <DateTimeInput className="w-full" props={{ date: targetDate }} />
           </div>
         )}
 
@@ -866,6 +864,7 @@ export default function Home() {
               setIsEventModalOpen(false);
             }}
             initialTitle={draggedStickyNote ? draggedStickyNote.title : ""}
+            targetDate={selectedDate}
           />
         </DialogContent>
       </Dialog>
