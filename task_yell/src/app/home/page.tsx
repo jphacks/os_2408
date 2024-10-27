@@ -57,7 +57,14 @@ import {
   subMonths,
 } from "date-fns";
 import { ja } from "date-fns/locale";
-import { addDoc, collection, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { AnimatePresence, motion, useDragControls } from "framer-motion";
 import {
   ChevronLeft,
@@ -587,10 +594,11 @@ export default function Home() {
                 return (
                   <motion.div
                     key={day.toISOString()}
-                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${!isCurrentMonth
-                      ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
-                      : ""
-                      } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
+                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${
+                      !isCurrentMonth
+                        ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
+                        : ""
+                    } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
                     onClick={() => handleDateSelect(day)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -756,30 +764,38 @@ export default function Home() {
                     {item.label}
                   </Button>
                   {item.label === "通知" && isNotificationsOpen && (
-                    <form className="ml-7 mt-2 space-y-4" action={async (data) => {
-                      if (auth.currentUser) {
-                        const docRef = doc(db, "users", auth.currentUser.uid);
-                        const snapshot = await getDoc(docRef);
-                        if (snapshot.exists()) {
-                          await updateDoc(docRef, {
-                            phoneNumber: data.get("phoneNumber"),
-                          });
-                        } else {
-                          setDoc(docRef, {
-                            phoneNumber: data.get("phoneNumber"),
-                          });
+                    <form
+                      className="ml-7 mt-2 space-y-4"
+                      action={async (data) => {
+                        if (auth.currentUser) {
+                          const docRef = doc(db, "users", auth.currentUser.uid);
+                          const snapshot = await getDoc(docRef);
+                          if (snapshot.exists()) {
+                            await updateDoc(docRef, {
+                              phoneNumber: data.get("phoneNumber"),
+                            });
+                          } else {
+                            setDoc(docRef, {
+                              phoneNumber: data.get("phoneNumber"),
+                            });
+                          }
                         }
-                      }
-                    }}>
+                      }}
+                    >
                       <div className="space-y-2">
                         <Label htmlFor="phone">電話番号</Label>
-                        <Input id="phone" name="phoneNumber" placeholder="+8190XXXXYYYY" />
+                        <Input
+                          id="phone"
+                          name="phoneNumber"
+                          placeholder="+8190XXXXYYYY"
+                        />
                       </div>
                       <div className="flex items-center space-x-2">
                         <Switch
                           id="notifications"
                           checked={notificationsEnabled}
-                          onCheckedChange={setNotificationsEnabled} />
+                          onCheckedChange={setNotificationsEnabled}
+                        />
                         <Label htmlFor="notifications">通知を有効にする</Label>
                       </div>
                       <Button type="submit">保存</Button>
