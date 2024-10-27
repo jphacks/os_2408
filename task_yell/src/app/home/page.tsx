@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { auth } from "@/firebase/client-app";
 import {
   AngleIcon,
   ListBulletIcon,
@@ -63,6 +64,7 @@ import {
   Download,
   LogOut,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 type Priority = "low" | "medium" | "high";
@@ -365,6 +367,16 @@ export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    // サインインしていない場合、サインインページにリダイレクト
+    auth.authStateReady().then(() => {
+      if (!auth.currentUser) {
+        router.push("/signin");
+      }
+    });
+  }, [router]);
 
   useEffect(() => {
     if (isDarkMode) {
