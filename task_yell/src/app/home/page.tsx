@@ -28,6 +28,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { auth } from "@/firebase/client-app";
+import { readEvents } from "@/lib/events";
+import { Category, Priority } from "@/lib/types";
 import {
   AngleIcon,
   ListBulletIcon,
@@ -67,11 +69,8 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-type Priority = "low" | "medium" | "high";
-type Category = "work" | "personal" | "shopping" | "health" | "other";
-
 type Todo = {
-  id: number;
+  id: string;
   text: string;
   completed: boolean;
   date: Date;
@@ -80,21 +79,21 @@ type Todo = {
 };
 
 type Event = {
-  id: number;
+  id: string;
   title: string;
-  start: Date;
-  end: Date;
+  start: Date | null;
+  end: Date | null;
   description: string;
   category: Category;
   priority: Priority;
-  location: string;
+  location: string | null;
   invitees: string;
   isTask: boolean;
   isLocked: boolean;
 };
 
 type StickyNote = {
-  id: number;
+  id: string;
   title: string;
 };
 
@@ -131,7 +130,7 @@ function EventCreator({
   const handleSave = () => {
     if (targetDate) {
       const newEvent: Event = {
-        id: Date.now(),
+        id: "",
         title,
         start: startTime,
         end: endTime,
@@ -151,12 +150,12 @@ function EventCreator({
   const renderDaySchedule = () => {
     // 選択された日のイベントをフィルタリング
     const dayEvents = events.filter((event) =>
-      isSameDay(event.start, startTime),
+      event.start && isSameDay(event.start, startTime),
     );
     const hours = Array.from({ length: 24 }, (_, i) => i);
 
     const sortedEvents = dayEvents.sort(
-      (a, b) => a.start.getTime() - b.start.getTime(),
+      (a, b) => (a.start && b.start) ? a.start.getTime() - b.start.getTime() : 0,
     );
 
     return (
@@ -177,8 +176,11 @@ function EventCreator({
               <span className="w-12 text-xs text-gray-500">{`${hour.toString().padStart(2, "0")}:00`}</span>
               <div className="flex-1 relative">
                 {sortedEvents
-                  .filter((event) => getHours(event.start) === hour)
+                  .filter((event) => event.start && getHours(event.start) === hour)
                   .map((event, index) => {
+                    if (!event.start || !event.end) {
+                      return <></>
+                    }
                     const startMinutes = event.start.getMinutes();
                     const duration =
                       (event.end.getTime() - event.start.getTime()) /
@@ -374,6 +376,19 @@ export default function Home() {
     auth.authStateReady().then(() => {
       if (!auth.currentUser) {
         router.push("/signin");
+      } else {
+        readEvents(auth.currentUser.uid).then((events) => {
+          setEvents(events.map((event) => {
+            return {
+              ...event,
+              invitees: event.attendees.join(", "),
+              isTask: false,
+              isLocked: false,
+              category: event.category || "other",
+              priority: event.priority || "medium",
+            };
+          }));
+        });
       }
     });
   }, [router]);
@@ -410,7 +425,7 @@ export default function Home() {
 
   const addStickyNote = () => {
     if (newStickyNote.trim()) {
-      const newNote: StickyNote = { id: Date.now(), title: newStickyNote };
+      const newNote: StickyNote = { id: "", title: newStickyNote };
       setStickyNotes([...stickyNotes, newNote]);
       setNewStickyNote("");
     }
@@ -428,7 +443,7 @@ export default function Home() {
     setEditingStickyNote(null);
   };
 
-  const deleteStickyNote = (id: number) => {
+  const deleteStickyNote = (id: string) => {
     const noteToRemove = stickyNotes.find((note) => note.id === id);
     if (noteToRemove) {
       setRemovedStickyNote(noteToRemove);
@@ -456,7 +471,7 @@ export default function Home() {
   };
 
   const getEventCountForDay = (day: Date) => {
-    return events.filter((event) => isSameDay(event.start, day)).length;
+    return events.filter((event) => event.start && isSameDay(event.start, day)).length;
   };
 
   const getTaskIndicatorStyle = (todoCount: number, eventCount: number) => {
@@ -507,17 +522,16 @@ export default function Home() {
                 const isCurrentMonth = isSameMonth(day, currentMonth);
                 const dayItems = [
                   ...todos.filter((todo) => isSameDay(todo.date, day)),
-                  ...events.filter((event) => isSameDay(event.start, day)),
+                  ...events.filter((event) => event.start && isSameDay(event.start, day)),
                 ];
 
                 return (
                   <motion.div
                     key={day.toISOString()}
-                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${
-                      !isCurrentMonth
-                        ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
-                        : ""
-                    } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
+                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${!isCurrentMonth
+                      ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
+                      : ""
+                      } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
                     onClick={() => handleDateSelect(day)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
