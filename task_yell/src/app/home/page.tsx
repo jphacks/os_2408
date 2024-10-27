@@ -29,6 +29,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { signOut } from "@/firebase/auth";
 import { auth, db } from "@/firebase/client-app";
+import { splitWantToDo } from "@/lib/ai";
 import { createEvent, readEvents } from "@/lib/events";
 import { createNotification } from "@/lib/notifications";
 import { subscribeNotification } from "@/lib/push-notification";
@@ -80,10 +81,12 @@ import {
   Users,
   Download,
   LogOut,
+  Brain,
   PhoneCall,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { generateStickyNoteServer } from "./actions";
 
 type Todo = {
   id: string;
@@ -524,6 +527,20 @@ export default function Home() {
     setEditingStickyNote(note);
   };
 
+  const generateStickyNote = async (note: StickyNote) => {
+    if (auth.currentUser) {
+      const uid = auth.currentUser.uid;
+      const generated = await generateStickyNoteServer(note.title);
+      // Firestoreに追加
+      if (generated) {
+        const items = await Promise.all(
+          generated.map(async (item) => ({ id: await createWantTodo(uid, item), title: item.title })),
+        );
+        setStickyNotes([...stickyNotes, ...items]);
+      }
+    }
+  };
+
   const updateStickyNote = async (updatedNote: StickyNote) => {
     const updatedNotes = stickyNotes.map((note) =>
       note.id === updatedNote.id ? updatedNote : note,
@@ -742,6 +759,13 @@ export default function Home() {
     >
       <h3 className="font-semibold mb-2">{note.title}</h3>
       <div className="flex justify-end space-x-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => generateStickyNote(note)}
+        >
+          <Brain className="h-4 w-4" />
+        </Button>
         <Button
           variant="ghost"
           size="icon"
