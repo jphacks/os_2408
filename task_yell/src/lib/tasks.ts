@@ -6,6 +6,7 @@ import {
   updateData,
 } from "@/firebase/firestore";
 import { Task } from "@/lib/types";
+import { Timestamp } from "firebase/firestore";
 const COLLECTION_NAME = "tasks";
 
 /**
@@ -24,7 +25,12 @@ export async function createTask(userId: string, task: Task): Promise<void> {
  * @returns 全タスク
  */
 export async function readTasks(userId: string): Promise<Task[]> {
-  return readData<Task>(`users/${userId}/${COLLECTION_NAME}`);
+  return readData<Task>(`users/${userId}/${COLLECTION_NAME}`).then((tasks) =>
+    tasks.map((task) => ({
+      ...task,
+      due: (task.due as unknown as Timestamp).toDate(),
+    })),
+  );
 }
 
 /**
@@ -37,7 +43,10 @@ export async function readSingleTask(
   userId: string,
   id: string,
 ): Promise<Task | null> {
-  return readSingleData<Task>(`users/${userId}/${COLLECTION_NAME}`, id);
+  return readSingleData<Task>(`users/${userId}/${COLLECTION_NAME}`, id).then(
+    (task) =>
+      task && { ...task, due: (task.due as unknown as Timestamp).toDate() },
+  );
 }
 
 /**

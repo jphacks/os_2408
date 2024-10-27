@@ -6,6 +6,7 @@ import {
   updateData,
   deleteData,
 } from "../firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 const COLLECTION_NAME = "notifications";
 
 export async function createNotification(
@@ -15,13 +16,24 @@ export async function createNotification(
 }
 
 export async function readNotification(): Promise<Notification[]> {
-  return readData<Notification>(COLLECTION_NAME);
+  return (await readData<Notification>(COLLECTION_NAME)).map(
+    (notification) => ({
+      ...notification,
+      datetime: (notification.datetime as unknown as Timestamp).toDate(),
+    }),
+  );
 }
 
 export async function readSingleNotification(
   id: string,
 ): Promise<Notification | null> {
-  return readSingleData<Notification>(COLLECTION_NAME, id);
+  return readSingleData<Notification>(COLLECTION_NAME, id).then(
+    (notification) =>
+      notification && {
+        ...notification,
+        datetime: (notification.datetime as unknown as Timestamp).toDate(),
+      },
+  );
 }
 
 export async function updateNotification(
