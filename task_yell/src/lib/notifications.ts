@@ -6,13 +6,14 @@ import {
   updateData,
   deleteData,
 } from "../firebase/firestore";
-import { Timestamp } from "firebase/firestore";
+import { doc, Timestamp } from "firebase/firestore";
+import { db } from "@/firebase/client-app";
 const COLLECTION_NAME = "notifications";
 
 export async function createNotification(
   notification: Notification,
 ): Promise<string> {
-  return createData(COLLECTION_NAME, notification);
+  return createData(COLLECTION_NAME, { ...notification, eventOrTaskRef: doc(db, notification.eventOrTaskRef) });
 }
 
 export async function readNotification(): Promise<Notification[]> {

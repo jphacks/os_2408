@@ -18,7 +18,7 @@ const COLLECTION_NAME = "events";
 export async function createEvent(
   userId: string,
   event: Event,
-): Promise<Event[] | null> {
+): Promise<Event[] | string> {
   // event.start ~ event.end とコンフリクトする予定があるかどうかを確認する
   const events = await readEvents(userId);
   let isConflict = false;
@@ -36,8 +36,8 @@ export async function createEvent(
   if (isConflict) {
     return events;
   } else {
-    await createData<Event>(`users/${userId}/${COLLECTION_NAME}`, event);
-    return null;
+    const result = await createData<Event>(`users/${userId}/${COLLECTION_NAME}`, event);
+    return result;
   }
 }
 
