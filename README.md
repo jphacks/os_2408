@@ -32,6 +32,7 @@
 <!--さらに、重要度によって、ユーザーへの通知の仕方も工夫した。重要度が低い予定やタスクは、低頻度のデスクトップ通知を行う。重要度が高くなるにつれて、通知の頻度が高くなっていく。重要度が最高レベルのものには、スマートフォンへ電話をかけることで、無視できない通知をすることにした。-->
 
 #### リンク類
+動画(YouTube)でのプロダクト紹介は[こちら](https://youtu.be/u_iBS8K2s6s)から
 
 より詳しい使い方等はこちらの[スライド動画](https://www.canva.com/design/DAGUu4UAsF0/IUgaJr0LKjhkuwHdAF52Qw/watch?utm_content=DAGUu4UAsF0&utm_campaign=designshare&utm_medium=link&utm_source=editor)から
 
