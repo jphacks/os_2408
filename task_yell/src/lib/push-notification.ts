@@ -20,8 +20,7 @@ export async function subscribeNotification() {
           // Now you can proceed with push subscription
           return registration.pushManager.subscribe({
             userVisibleOnly: true, // Ensures that the push notifications are always visible
-            applicationServerKey:
-              process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+            applicationServerKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
           });
         })
         .then((subscription) => {

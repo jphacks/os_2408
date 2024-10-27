@@ -60,12 +60,7 @@ import {
   subMonths,
 } from "date-fns";
 import { ja } from "date-fns/locale";
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import { AnimatePresence, motion, useDragControls } from "framer-motion";
 import {
   ChevronLeft,
@@ -129,7 +124,10 @@ function EventCreator({
   targetDate,
   events,
 }: {
-  onSave: (event: Event, notification: { date: Date | null, type: "call" | "push" }) => void;
+  onSave: (
+    event: Event,
+    notification: { date: Date | null; type: "call" | "push" },
+  ) => void;
   onCancel: () => void;
   initialTitle?: string;
   targetDate: Date;
@@ -146,7 +144,9 @@ function EventCreator({
   const [isTask, setIsTask] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [notificationDate, setNotificationDate] = useState<Date | null>(null);
-  const [notificationType, setNotificationType] = useState<"call" | "push">("call");
+  const [notificationType, setNotificationType] = useState<"call" | "push">(
+    "call",
+  );
 
   const handleSave = () => {
     if (targetDate) {
@@ -534,7 +534,10 @@ export default function Home() {
       // Firestoreに追加
       if (generated) {
         const items = await Promise.all(
-          generated.map(async (item) => ({ id: await createWantTodo(uid, item), title: item.title })),
+          generated.map(async (item) => ({
+            id: await createWantTodo(uid, item),
+            title: item.title,
+          })),
         );
         setStickyNotes([...stickyNotes, ...items]);
       }
@@ -568,7 +571,10 @@ export default function Home() {
     }
   };
 
-  const addEvent = async (newEvent: Event, notification: { date: Date | null, type: "call" | "push" }) => {
+  const addEvent = async (
+    newEvent: Event,
+    notification: { date: Date | null; type: "call" | "push" },
+  ) => {
     setEvents([...events, newEvent]);
     setIsEventModalOpen(false);
     setRemovedStickyNote(null);
@@ -665,10 +671,11 @@ export default function Home() {
                 return (
                   <motion.div
                     key={day.toISOString()}
-                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${!isCurrentMonth
-                      ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
-                      : ""
-                      } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
+                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${
+                      !isCurrentMonth
+                        ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
+                        : ""
+                    } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
                     onClick={() => handleDateSelect(day)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
@@ -911,7 +918,7 @@ export default function Home() {
 
         <div className="w-full lg:w-1/2 pl-2 bg-white dark:bg-gray-800 overflow-auto lg:block hidden">
           <h2 className="text-xl lg:text-2xl font-bold mb-4 dark:text-white">
-            付箋
+            WanTODO
           </h2>
           <div className="flex flex-col lg:flex-row mb-4 space-y-2 lg:space-y-0 lg:space-x-2">
             <Input
@@ -928,7 +935,7 @@ export default function Home() {
           <div className="mb-4">
             <Input
               type="text"
-              placeholder="付箋を検索..."
+              placeholder="WanTODOを検索..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full"
@@ -1021,7 +1028,8 @@ export default function Home() {
               >
                 <ChevronUp className="h-6 w-6 text-gray-400 flex-shrink-0" />
                 <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
-                  {format(selectedDate, "yyyy年MM月dd日", { locale: ja })}の付箋
+                  {format(selectedDate, "yyyy年MM月dd日", { locale: ja })}
+                  のWanTODO
                 </span>
                 {filteredStickyNotes.length > 0 && (
                   <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
@@ -1036,7 +1044,7 @@ export default function Home() {
                 <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-semibold dark:text-white">
                     {format(selectedDate, "yyyy年MM月dd日", { locale: ja })}
-                    の付箋
+                    のWanTODO
                   </h3>
                   <Button
                     variant="ghost"
@@ -1051,7 +1059,7 @@ export default function Home() {
                     type="text"
                     value={newStickyNote}
                     onChange={(e) => setNewStickyNote(e.target.value)}
-                    placeholder="新しい付箋のタイトルを入力"
+                    placeholder="新しいWanTODOのタイトルを入力"
                     className="w-full"
                   />
                   <Button onClick={addStickyNote} className="w-full">
@@ -1065,7 +1073,7 @@ export default function Home() {
                     </div>
                   ) : (
                     <p className="dark:text-gray-300">
-                      この日の付箋はありません。
+                      この日のWanTODOはありません。
                     </p>
                   )}
                 </div>
@@ -1081,7 +1089,7 @@ export default function Home() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>付箋を編集</DialogTitle>
+            <DialogTitle>WanTODOを編集</DialogTitle>
           </DialogHeader>
           {editingStickyNote && (
             <div className="space-y-4">

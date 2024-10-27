@@ -36,7 +36,10 @@ export async function createEvent(
   if (isConflict) {
     return events;
   } else {
-    const result = await createData<Event>(`users/${userId}/${COLLECTION_NAME}`, event);
+    const result = await createData<Event>(
+      `users/${userId}/${COLLECTION_NAME}`,
+      event,
+    );
     return result;
   }
 }

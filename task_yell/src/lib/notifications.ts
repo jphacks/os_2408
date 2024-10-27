@@ -13,7 +13,10 @@ const COLLECTION_NAME = "notifications";
 export async function createNotification(
   notification: Notification,
 ): Promise<string> {
-  return createData(COLLECTION_NAME, { ...notification, eventOrTaskRef: doc(db, notification.eventOrTaskRef) });
+  return createData(COLLECTION_NAME, {
+    ...notification,
+    eventOrTaskRef: doc(db, notification.eventOrTaskRef),
+  });
 }
 
 export async function readNotification(): Promise<Notification[]> {
