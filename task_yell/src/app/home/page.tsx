@@ -57,6 +57,10 @@ import {
   Trash2,
   UserPlusIcon,
   X,
+  Bell,
+  Users,
+  Download,
+  LogOut,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -291,6 +295,9 @@ export default function Home() {
   );
   const dragControls = useDragControls();
   const modalRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -299,6 +306,28 @@ export default function Home() {
       document.documentElement.classList.remove("dark");
     }
   }, [isDarkMode]);
+
+  /**
+   * ハンバーガーメニューの詳細
+   */
+  const menuItems = [
+    {
+      icon: Bell,
+      label: "通知",
+      onClick: () => setIsNotificationsOpen(!isNotificationsOpen),
+    },
+    { icon: Users, label: "友達", onClick: () => console.log("友達") },
+    {
+      icon: Download,
+      label: "インポート",
+      onClick: () => console.log("インポート"),
+    },
+    {
+      icon: LogOut,
+      label: "ログアウト",
+      onClick: () => console.log("ログアウト"),
+    },
+  ];
 
   const addStickyNote = () => {
     if (newStickyNote.trim()) {
@@ -405,9 +434,7 @@ export default function Home() {
                 return (
                   <motion.div
                     key={day.toISOString()}
-                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${
-                      isSelected ? "border-blue-300 dark:border-blue-600" : ""
-                    } ${
+                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${
                       !isCurrentMonth
                         ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
                         : ""
@@ -447,11 +474,7 @@ export default function Home() {
                         {dayItems.slice(0, 2).map((item, index) => (
                           <div
                             key={index}
-                            className={`text-xs p-1 rounded ${
-                              "text" in item
-                                ? priorityColors[item.priority]
-                                : priorityColors[item.priority]
-                            }`}
+                            className={`text-xs p-1 rounded ${"text" in item ? priorityColors[item.priority] : priorityColors[item.priority]}`}
                           >
                             {"text" in item ? item.text : item.title}
                           </div>
@@ -542,18 +565,19 @@ export default function Home() {
     <div
       className={`relative h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden ${isDarkMode ? "dark" : ""}`}
     >
-      <Sheet>
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
           <Button
             variant="ghost"
             size="icon"
             className="fixed top-4 left-4 z-50 w-12 h-12 bg-white dark:bg-gray-800 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700"
           >
+            {/* CSS変更する必要あるかも */}
             <Menu className="h-6 w-6" />
             <span className="sr-only">メニューを開く</span>
           </Button>
         </SheetTrigger>
-        <SheetContent side="left">
+        <SheetContent side="left" className="w-[300px] sm:w-[400px]">
           <SheetHeader>
             <SheetTitle>設定</SheetTitle>
           </SheetHeader>
@@ -567,6 +591,38 @@ export default function Home() {
               <Label htmlFor="dark-mode">ダークモード</Label>
             </div>
           </div>
+          <nav className="mt-8">
+            <ul className="space-y-4">
+              {menuItems.map((item, index) => (
+                <li key={index}>
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={item.onClick}
+                  >
+                    <item.icon className="mr-2 h-5 w-5" />
+                    {item.label}
+                  </Button>
+                  {item.label === "通知" && isNotificationsOpen && (
+                    <div className="ml-7 mt-2 space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">電話番号</Label>
+                        <Input id="phone" placeholder="電話番号を入力" />
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          id="notifications"
+                          checked={notificationsEnabled}
+                          onCheckedChange={setNotificationsEnabled}
+                        />
+                        <Label htmlFor="notifications">通知を有効にする</Label>
+                      </div>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </nav>
         </SheetContent>
       </Sheet>
 
