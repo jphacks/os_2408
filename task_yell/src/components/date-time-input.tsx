@@ -63,7 +63,7 @@ export function DateTimeInput({ className }: { className?: string }) {
             <SelectContent>
               {timeOptions.map((t) => (
                 <SelectItem key={t} value={t}>
-                  {time}
+                  {t}
                 </SelectItem>
               ))}
             </SelectContent>
