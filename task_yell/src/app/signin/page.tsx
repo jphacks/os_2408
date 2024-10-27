@@ -14,7 +14,7 @@ export default function SignUpPage() {
     const provider = new GoogleAuthProvider();
     const cred = await signInWithPopup(auth, provider);
     if (cred.user) {
-      router.push("/");
+      router.push("/home");
     }
   }, [router]);
 
