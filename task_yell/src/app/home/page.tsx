@@ -125,7 +125,7 @@ function EventCreator({
 }: {
   onSave: (
     event: Event,
-    notification: { date: Date | null; type: "call" | "push" }
+    notification: { date: Date | null; type: "call" | "push" },
   ) => void;
   onCancel: () => void;
   initialTitle?: string;
@@ -144,7 +144,7 @@ function EventCreator({
   const [isLocked, setIsLocked] = useState(false);
   const [notificationDate, setNotificationDate] = useState<Date | null>(null);
   const [notificationType, setNotificationType] = useState<"call" | "push">(
-    "call"
+    "call",
   );
 
   const handleSave = () => {
@@ -170,12 +170,12 @@ function EventCreator({
   const renderDaySchedule = () => {
     // 選択された日のイベントをフィルタリング
     const dayEvents = events.filter(
-      (event) => event.start && isSameDay(event.start, startTime)
+      (event) => event.start && isSameDay(event.start, startTime),
     );
     const hours = Array.from({ length: 24 }, (_, i) => i);
 
     const sortedEvents = dayEvents.sort((a, b) =>
-      a.start && b.start ? a.start.getTime() - b.start.getTime() : 0
+      a.start && b.start ? a.start.getTime() - b.start.getTime() : 0,
     );
 
     return (
@@ -197,7 +197,7 @@ function EventCreator({
               <div className="flex-1 relative">
                 {sortedEvents
                   .filter(
-                    (event) => event.start && getHours(event.start) === hour
+                    (event) => event.start && getHours(event.start) === hour,
                   )
                   .map((event, index) => {
                     if (!event.start || !event.end) {
@@ -411,15 +411,15 @@ export default function Home() {
   >("partial");
   const [searchTerm, setSearchTerm] = useState("");
   const [editingStickyNote, setEditingStickyNote] = useState<StickyNote | null>(
-    null
+    null,
   );
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [draggedStickyNote, setDraggedStickyNote] = useState<StickyNote | null>(
-    null
+    null,
   );
   const [removedStickyNote, setRemovedStickyNote] = useState<StickyNote | null>(
-    null
+    null,
   );
   const dragControls = useDragControls();
   const modalRef = useRef<HTMLDivElement>(null);
@@ -445,7 +445,7 @@ export default function Home() {
                 category: event.category || "other",
                 priority: event.priority || "medium",
               };
-            })
+            }),
           );
         });
 
@@ -456,7 +456,7 @@ export default function Home() {
                 id: todo.id,
                 title: todo.title,
               };
-            })
+            }),
           );
         });
       }
@@ -496,7 +496,7 @@ export default function Home() {
       onClick: () => {
         if (auth.currentUser) {
           router.push(
-            `/api/auth/google-cal?userId=${encodeURIComponent(auth.currentUser.uid)}`
+            `/api/auth/google-cal?userId=${encodeURIComponent(auth.currentUser.uid)}`,
           );
         }
       },
@@ -536,7 +536,7 @@ export default function Home() {
           generated.map(async (item) => ({
             id: await createWantTodo(uid, item),
             title: item.title,
-          }))
+          })),
         );
         setStickyNotes([...stickyNotes, ...items]);
       }
@@ -545,7 +545,7 @@ export default function Home() {
 
   const updateStickyNote = async (updatedNote: StickyNote) => {
     const updatedNotes = stickyNotes.map((note) =>
-      note.id === updatedNote.id ? updatedNote : note
+      note.id === updatedNote.id ? updatedNote : note,
     );
     setStickyNotes(updatedNotes);
     setEditingStickyNote(null);
@@ -572,7 +572,7 @@ export default function Home() {
 
   const addEvent = async (
     newEvent: Event,
-    notification: { date: Date | null; type: "call" | "push" }
+    notification: { date: Date | null; type: "call" | "push" },
   ) => {
     setEvents([...events, newEvent]);
     setIsEventModalOpen(false);
@@ -643,8 +643,8 @@ export default function Home() {
           const weekDays = days.slice(weekIndex * 7, (weekIndex + 1) * 7);
           const maxEventsInWeek = Math.max(
             ...weekDays.map(
-              (day) => getTodoCountForDay(day) + getEventCountForDay(day)
-            )
+              (day) => getTodoCountForDay(day) + getEventCountForDay(day),
+            ),
           );
           const weekHeight =
             maxEventsInWeek > 2 ? Math.min(maxEventsInWeek * 20, 100) : "auto";
@@ -663,7 +663,7 @@ export default function Home() {
                 const dayItems = [
                   ...todos.filter((todo) => isSameDay(todo.date, day)),
                   ...events.filter(
-                    (event) => event.start && isSameDay(event.start, day)
+                    (event) => event.start && isSameDay(event.start, day),
                   ),
                 ];
 
@@ -682,20 +682,20 @@ export default function Home() {
                       e.preventDefault();
                       e.currentTarget.classList.add(
                         "bg-blue-100",
-                        "dark:bg-blue-800"
+                        "dark:bg-blue-800",
                       );
                     }}
                     onDragLeave={(e) => {
                       e.currentTarget.classList.remove(
                         "bg-blue-100",
-                        "dark:bg-blue-800"
+                        "dark:bg-blue-800",
                       );
                     }}
                     onDrop={(e) => {
                       e.preventDefault();
                       e.currentTarget.classList.remove(
                         "bg-blue-100",
-                        "dark:bg-blue-800"
+                        "dark:bg-blue-800",
                       );
                       if (draggedStickyNote) {
                         handleDateSelect(day);
@@ -792,7 +792,7 @@ export default function Home() {
 
   const filteredStickyNotes = useMemo(() => {
     return stickyNotes.filter((note) =>
-      note.title.toLowerCase().includes(searchTerm.toLowerCase())
+      note.title.toLowerCase().includes(searchTerm.toLowerCase()),
     );
   }, [stickyNotes, searchTerm]);
 
