@@ -12,6 +12,8 @@ export default function Home() {
     auth.authStateReady().then(() => {
       if (!auth.currentUser) {
         router.push("/signin");
+      } else {
+        router.push("/home");
       }
     });
   }, [router]);
