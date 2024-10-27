@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Menu, CalendarIcon, ChevronLeft, ChevronRight, X, ChevronUp, Search, Edit, Trash2, SunMoon, MapPinIcon, UserPlusIcon } from 'lucide-react'
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, getDay, isToday, isFuture, parseISO, getHours, startOfWeek, endOfWeek, addDays } from 'date-fns'
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths, getDay, isToday, isFuture, parseISO, getHours, startOfWeek, endOfWeek, addDays, addMinutes, isBefore, isAfter } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -52,9 +52,9 @@ type StickyNote = {
 }
 
 const priorityColors: Record<Priority, string> = {
-  low: 'bg-blue-100 dark:bg-blue-900',
-  medium: 'bg-yellow-100 dark:bg-yellow-900',
-  high: 'bg-red-100 dark:bg-red-900'
+  low: 'bg-blue-100 dark:bg-blue-800 text-blue-800 dark:text-blue-100',
+  medium: 'bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-100',
+  high: 'bg-red-100 dark:bg-red-800 text-red-800 dark:text-red-100'
 }
 
 const categoryIcons: Record<Category, JSX.Element> = {
@@ -65,10 +65,18 @@ const categoryIcons: Record<Category, JSX.Element> = {
   other: <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" /></svg>,
 }
 
-function EventCreator({ onSave, onCancel, initialTitle = '' }: { onSave: (event: Event) => void, onCancel: () => void, initialTitle?: string }) {
+// EventCreator コンポーネント
+// 新しいイベントを作成するためのフォームを提供します。
+// props:
+// - onSave: 新しいイベントを保存する関数
+// - onCancel: フォームをキャンセルする関数
+// - initialTitle: 初期タイトル（オプション）
+// - selectedDate: 選択された日付
+// - events: 既存のイベントリスト
+function EventCreator({ onSave, onCancel, initialTitle = '', selectedDate, events }: { onSave: (event: Event) => void, onCancel: () => void, initialTitle?: string, selectedDate: Date, events: Event[] }) {
   const [title, setTitle] = useState(initialTitle)
   const [description, setDescription] = useState('')
-  const [date, setDate] = useState<Date | undefined>(new Date())
+  const [date, setDate] = useState<Date | undefined>(selectedDate)
   const [startTime, setStartTime] = useState('10:00')
   const [endTime, setEndTime] = useState('11:00')
   const [location, setLocation] = useState('')
@@ -118,20 +126,56 @@ function EventCreator({ onSave, onCancel, initialTitle = '' }: { onSave: (event:
     }
   }
 
+  // 選択された日のスケジュールを描画する関数
+  const renderDaySchedule = () => {
+    // 選択された日のイベントをフィルタリング
+    const dayEvents = events.filter(event => isSameDay(event.start, selectedDate))
+    const hours = Array.from({ length: 24 }, (_, i) => i)
+
+    const sortedEvents = dayEvents.sort((a, b) => a.start.getTime() - b.start.getTime())
+
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+        <h3 className="text-lg font-semibold mb-4">{format(selectedDate, 'yyyy年MM月dd日 (E)', { locale: ja })}のスケジュール</h3>
+        <div className="relative" style={{ height: '600px', overflowY: 'auto' }}>
+          {hours.map(hour => (
+            <div key={hour} className="flex items-center h-12 border-t border-gray-200 dark:border-gray-700">
+              <span className="w-12 text-xs text-gray-500">{`${hour.toString().padStart(2, '0')}:00`}</span>
+              <div className="flex-1 relative">
+                {sortedEvents
+                  .filter(event => getHours(event.start) === hour)
+                  .map((event, index) => {
+                    const startMinutes = event.start.getMinutes()
+                    const duration = (event.end.getTime() - event.start.getTime()) / (1000 * 60)
+                    const height = `${duration}px`
+                    const top = `${startMinutes}px`
+                    const width = index === 0 ? '200%' : '150%'
+                    const left = index === 0 ? '0%' : `${50 * Math.min(index, 3)}%`
+                    const zIndex = index + 1
+
+                    return (
+                      <div
+                        key={event.id}
+                        className={`absolute p-1 text-xs rounded-sm ${priorityColors[event.priority]} overflow-hidden border border-gray-300 dark:border-gray-600`}
+                        style={{ top, height, minHeight: '20px', width, left, zIndex }}
+                      >
+                        <div className="font-semibold truncate">{event.title}</div>
+                        <div className="truncate">{`${format(event.start, 'HH:mm')} - ${format(event.end, 'HH:mm')}`}</div>
+                      </div>
+                    )
+                  })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex space-x-4">
       <div className="w-2/5">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-2">
-          <h3 className="text-sm font-semibold mb-2">{format(date || new Date(), 'yyyy年MM月dd日 (E)', { locale: ja })}</h3>
-          <div className="space-y-1">
-            {Array.from({ length: 24 }).map((_, hour) => (
-              <div key={hour} className="flex items-center">
-                <span className="w-8 text-xs text-gray-500">{`${hour.toString().padStart(2, '0')}:00`}</span>
-                <div className="flex-1 h-4 border-t border-gray-200 dark:border-gray-700"></div>
-              </div>
-            ))}
-          </div>
-        </div>
+        {renderDaySchedule()}
       </div>
       <div className="w-3/5 space-y-3">
       <div className="flex items-center space-x-2">
@@ -196,6 +240,7 @@ function EventCreator({ onSave, onCancel, initialTitle = '' }: { onSave: (event:
 
           <Textarea
             placeholder="説明を追加"
+            
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
@@ -245,7 +290,7 @@ function EventCreator({ onSave, onCancel, initialTitle = '' }: { onSave: (event:
             <Checkbox
               id="is-locked"
               checked={isLocked}
-              onCheckedChange={(checked) => setIsLocked(checked as boolean)}
+              onCheckedChange={(checked) =>   setIsLocked(checked as boolean)}
             />
             <Label  htmlFor="is-locked">ロックする</Label>
           </div>
@@ -253,7 +298,7 @@ function EventCreator({ onSave, onCancel, initialTitle = '' }: { onSave: (event:
       )}
 
       <div className="flex justify-end space-x-2">
-        <Button  variant="outline" onClick={onCancel}>キャンセル</Button>
+        <Button variant="outline" onClick={onCancel}>キャンセル</Button>
         <Button onClick={handleSave}>保存</Button>
       </div>
       </div>
@@ -261,7 +306,10 @@ function EventCreator({ onSave, onCancel, initialTitle = '' }: { onSave: (event:
   )
 }
 
+// EnhancedCalendarTodoApp コンポーネント
+// カレンダー、ToDoリスト、イベント管理機能を統合したメインアプリケーション
 export function EnhancedCalendarTodoAppV3() {
+  // ステート変数の定義
   const [todos, setTodos] = useState<Todo[]>([])
   const [events, setEvents] = useState<Event[]>([])
   const [stickyNotes, setStickyNotes] = useState<StickyNote[]>([])
@@ -347,6 +395,7 @@ export function EnhancedCalendarTodoAppV3() {
     return `${colorClass} ${count >= 3 ? 'animate-pulse' : ''}`
   }
 
+  // カレンダーを描画する関数
   const renderCalendar = () => {
     const days = getDaysInMonth(currentMonth)
     const weeks = Math.ceil(days.length / 7)
@@ -435,6 +484,8 @@ export function EnhancedCalendarTodoAppV3() {
     setIsEventModalOpen(true)
   }
 
+  // StickyNoteItem コンポーネント
+  // 個々の付箋を表示し、編集・削除機能を提供
   const StickyNoteItem = ({ note }: { note: StickyNote }) => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -480,6 +531,51 @@ export function EnhancedCalendarTodoAppV3() {
       if (prevState === 'partial') return 'full'
       return 'partial'
     })
+  }
+
+
+  const renderDaySchedule = () => {
+    const dayEvents = events.filter(event => isSameDay(event.start, selectedDate))
+    const hours = Array.from({ length: 24 }, (_, i) => i)
+
+    const sortedEvents = dayEvents.sort((a, b) => a.start.getTime() - b.start.getTime())
+
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mt-4">
+        <h3 className="text-lg font-semibold mb-4">{format(selectedDate, 'yyyy年MM月dd日 (E)', { locale: ja })}のスケジュール</h3>
+        <div className="relative">
+          {hours.map(hour => (
+            <div key={hour} className="flex items-center h-12 border-t border-gray-200 dark:border-gray-700">
+              <span className="w-12 text-xs text-gray-500">{`${hour.toString().padStart(2, '0')}:00`}</span>
+              <div className="flex-1 relative">
+                {sortedEvents
+                  .filter(event => getHours(event.start) === hour)
+                  .map((event, index) => {
+                    const startMinutes = event.start.getMinutes()
+                    const duration = (event.end.getTime() - event.start.getTime()) / (1000 * 60)
+                    const height = `${duration}px`
+                    const top = `${startMinutes}px`
+                    const width = index === 0 ? '200%' : '150%'
+                    const left = index === 0 ? '0%' : `${50 * Math.min(index, 3)}%`
+                    const zIndex = index + 1
+
+                    return (
+                      <div
+                        key={event.id}
+                        className={`absolute p-1 text-xs rounded-sm ${priorityColors[event.priority]} overflow-hidden border border-gray-300 dark:border-gray-600`}
+                        style={{ top, height, minHeight: '20px', width, left, zIndex }}
+                      >
+                        <div className="font-semibold truncate">{event.title}</div>
+                        <div className="truncate">{`${format(event.start, 'HH:mm')} - ${format(event.end, 'HH:mm')}`}</div>
+                      </div>
+                    )
+                  })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -550,7 +646,7 @@ export function EnhancedCalendarTodoAppV3() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <AnimatePresence>
               {filteredStickyNotes.map(note => (
-                <StickyNoteItem key={note.id} note={note} />
+                                                <StickyNoteItem key={note.id} note={note} />
               ))}
             </AnimatePresence>
           </div>
@@ -582,7 +678,7 @@ export function EnhancedCalendarTodoAppV3() {
               animate={{
                 y: modalState === 'minimized'
                   ? "calc(100% - 40px)"
-                  : modalState ===  'partial'
+                  : modalState === 'partial'
                     ? "calc(100% - 400px)"
                     : "0%",
                 height: modalState === 'full' ? '100%' : modalState === 'partial' ? '400px' : '40px',
@@ -701,6 +797,8 @@ export function EnhancedCalendarTodoAppV3() {
               setIsEventModalOpen(false)
             }} 
             initialTitle={draggedStickyNote ? draggedStickyNote.title : ''}
+            selectedDate={selectedDate}
+            events={events}
           />
         </DialogContent>
       </Dialog>
