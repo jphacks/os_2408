@@ -31,7 +31,12 @@ import { signOut } from "@/firebase/auth";
 import { auth } from "@/firebase/client-app";
 import { createEvent, readEvents } from "@/lib/events";
 import { Category, Priority } from "@/lib/types";
-import { createWantTodo, deleteWantTodo, readWantTodos, updateWantTodo } from "@/lib/want-todo";
+import {
+  createWantTodo,
+  deleteWantTodo,
+  readWantTodos,
+  updateWantTodo,
+} from "@/lib/want-todo";
 import {
   AngleIcon,
   ListBulletIcon,
@@ -151,13 +156,13 @@ function EventCreator({
   // 選択された日のスケジュールを描画する関数
   const renderDaySchedule = () => {
     // 選択された日のイベントをフィルタリング
-    const dayEvents = events.filter((event) =>
-      event.start && isSameDay(event.start, startTime),
+    const dayEvents = events.filter(
+      (event) => event.start && isSameDay(event.start, startTime),
     );
     const hours = Array.from({ length: 24 }, (_, i) => i);
 
-    const sortedEvents = dayEvents.sort(
-      (a, b) => (a.start && b.start) ? a.start.getTime() - b.start.getTime() : 0,
+    const sortedEvents = dayEvents.sort((a, b) =>
+      a.start && b.start ? a.start.getTime() - b.start.getTime() : 0,
     );
 
     return (
@@ -178,10 +183,12 @@ function EventCreator({
               <span className="w-12 text-xs text-gray-500">{`${hour.toString().padStart(2, "0")}:00`}</span>
               <div className="flex-1 relative">
                 {sortedEvents
-                  .filter((event) => event.start && getHours(event.start) === hour)
+                  .filter(
+                    (event) => event.start && getHours(event.start) === hour,
+                  )
                   .map((event, index) => {
                     if (!event.start || !event.end) {
-                      return <></>
+                      return <></>;
                     }
                     const startMinutes = event.start.getMinutes();
                     const duration =
@@ -380,25 +387,29 @@ export default function Home() {
         router.push("/signin");
       } else {
         readEvents(auth.currentUser.uid).then((events) => {
-          setEvents(events.map((event) => {
-            return {
-              ...event,
-              invitees: event.attendees.join(", "),
-              isTask: false,
-              isLocked: false,
-              category: event.category || "other",
-              priority: event.priority || "medium",
-            };
-          }));
+          setEvents(
+            events.map((event) => {
+              return {
+                ...event,
+                invitees: event.attendees.join(", "),
+                isTask: false,
+                isLocked: false,
+                category: event.category || "other",
+                priority: event.priority || "medium",
+              };
+            }),
+          );
         });
 
         readWantTodos(auth.currentUser.uid).then((todos) => {
-          setStickyNotes(todos.map((todo) => {
-            return {
-              id: todo.id,
-              title: todo.title,
-            };
-          }));
+          setStickyNotes(
+            todos.map((todo) => {
+              return {
+                id: todo.id,
+                title: todo.title,
+              };
+            }),
+          );
         });
       }
     });
@@ -429,7 +440,9 @@ export default function Home() {
       label: "インポート",
       onClick: () => {
         if (auth.currentUser) {
-          router.push(`/api/auth/google-cal?userId=${encodeURIComponent(auth.currentUser.uid)}`)
+          router.push(
+            `/api/auth/google-cal?userId=${encodeURIComponent(auth.currentUser.uid)}`,
+          );
         }
       },
     },
@@ -467,7 +480,7 @@ export default function Home() {
     if (auth.currentUser) {
       await updateWantTodo(auth.currentUser.uid, updatedNote.id, {
         title: updatedNote.title,
-      })
+      });
     }
   };
 
@@ -492,10 +505,12 @@ export default function Home() {
     if (auth.currentUser) {
       await createEvent(auth.currentUser.uid, {
         ...newEvent,
-        attendees: newEvent.invitees.split(",").map((invitee) => invitee.trim()),
+        attendees: newEvent.invitees
+          .split(",")
+          .map((invitee) => invitee.trim()),
         category: newEvent.category,
         priority: newEvent.priority,
-        reccurence: []
+        reccurence: [],
       });
     }
   };
@@ -511,7 +526,8 @@ export default function Home() {
   };
 
   const getEventCountForDay = (day: Date) => {
-    return events.filter((event) => event.start && isSameDay(event.start, day)).length;
+    return events.filter((event) => event.start && isSameDay(event.start, day))
+      .length;
   };
 
   const getTaskIndicatorStyle = (todoCount: number, eventCount: number) => {
@@ -562,16 +578,19 @@ export default function Home() {
                 const isCurrentMonth = isSameMonth(day, currentMonth);
                 const dayItems = [
                   ...todos.filter((todo) => isSameDay(todo.date, day)),
-                  ...events.filter((event) => event.start && isSameDay(event.start, day)),
+                  ...events.filter(
+                    (event) => event.start && isSameDay(event.start, day),
+                  ),
                 ];
 
                 return (
                   <motion.div
                     key={day.toISOString()}
-                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${!isCurrentMonth
-                      ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
-                      : ""
-                      } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
+                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${
+                      !isCurrentMonth
+                        ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
+                        : ""
+                    } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
                     onClick={() => handleDateSelect(day)}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
