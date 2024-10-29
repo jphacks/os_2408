@@ -72,6 +72,7 @@ wanTODO に追加した内容を細分化する機能を作成した。この機
 - 今までにない斬新な機能　 wanTODO
 
 ## 開発技術
+<img width="900" alt="スクリーンショット 2024-10-29 14 08 24" src="https://github.com/user-attachments/assets/ed009666-96b0-4eec-9cfd-0da843be83dd">
 
 ### 活用した技術
 
