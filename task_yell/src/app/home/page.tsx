@@ -47,6 +47,7 @@ import { EventCreator } from "@/components/event-creator";
 import { Event, Todo, StickyNote } from "@/components/types";
 import { priorityColors } from "@/components/priority-colors";
 import { Navigation } from "@/components/navigation";
+import { EditWantodoDialog } from "@/components/edit-wantodo-dialog";
 
 export default function Home() {
   const [todos] = useState<Todo[]>([]);
@@ -607,38 +608,11 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      <Dialog
-        open={!!editingStickyNote}
-        onOpenChange={() => setEditingStickyNote(null)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>wanTODOを編集</DialogTitle>
-          </DialogHeader>
-          {editingStickyNote && (
-            <div className="space-y-4">
-              <Input
-                type="text"
-                value={editingStickyNote.title}
-                onChange={(e) =>
-                  setEditingStickyNote({
-                    ...editingStickyNote,
-                    title: e.target.value,
-                  })
-                }
-                placeholder="タイトルを入力"
-              />
-              <Button
-                onClick={() =>
-                  editingStickyNote && updateStickyNote(editingStickyNote)
-                }
-              >
-                更新
-              </Button>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <EditWantodoDialog
+        editingStickyNote={editingStickyNote}
+        setEditingStickyNote={setEditingStickyNote}
+        updateStickyNote={updateStickyNote}
+      />
 
       <Dialog open={isEventModalOpen} onOpenChange={setIsEventModalOpen}>
         <DialogContent className="max-w-3xl">
