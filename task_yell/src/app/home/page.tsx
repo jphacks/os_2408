@@ -13,14 +13,7 @@ import {
 } from "@/lib/want-todo";
 import {
   addMonths,
-  eachDayOfInterval,
-  endOfMonth,
-  endOfWeek,
   format,
-  isSameDay,
-  isSameMonth,
-  startOfMonth,
-  startOfWeek,
   subMonths,
 } from "date-fns";
 import { ja } from "date-fns/locale";
@@ -35,11 +28,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { generateStickyNoteServer } from "./actions";
 import { Event, Todo, StickyNote } from "@/components/types";
-import { priorityColors } from "@/components/priority-colors";
 import { Navigation } from "@/components/navigation";
 import { EditWantodoDialog } from "@/components/edit-wantodo-dialog";
 import { CreateEventDialog } from "@/components/create-event-dialog";
 import { StickyNoteItem } from "@/components/sticky-note-item";
+import { CalendarRenderer } from "@/components/calendar-renderer";
 
 export default function Home() {
   const [todos] = useState<Todo[]>([]);
@@ -199,138 +192,6 @@ export default function Home() {
     }
   };
 
-  const getDaysInMonth = (date: Date) => {
-    const start = startOfWeek(startOfMonth(date), { weekStartsOn: 0 });
-    const end = endOfWeek(endOfMonth(date), { weekStartsOn: 0 });
-    return eachDayOfInterval({ start, end });
-  };
-
-  const getTodoCountForDay = (day: Date) => {
-    return todos.filter((todo) => isSameDay(todo.date, day)).length;
-  };
-
-  const getEventCountForDay = (day: Date) => {
-    return events.filter((event) => event.start && isSameDay(event.start, day))
-      .length;
-  };
-
-  const getTaskIndicatorStyle = (todoCount: number, eventCount: number) => {
-    const count = todoCount + eventCount;
-    if (count === 0) return "";
-    const baseColor = isDarkMode ? "bg-red-" : "bg-red-";
-    const intensity = Math.min(count * 100, 900);
-    const colorClass = `${baseColor}${intensity}`;
-    return `${colorClass} ${count >= 3 ? "animate-pulse" : ""}`;
-  };
-
-  const renderCalendar = () => {
-    const days = getDaysInMonth(currentMonth);
-    const weeks = Math.ceil(days.length / 7);
-
-    return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
-        <div className="grid grid-cols-7 gap-1">
-          {["日", "月", "火", "水", "木", "金", "土"].map((day) => (
-            <div
-              key={day}
-              className="text-center font-semibold text-gray-600 dark:text-gray-300 p-2"
-            >
-              {day}
-            </div>
-          ))}
-        </div>
-        {Array.from({ length: weeks }).map((_, weekIndex) => {
-          const weekDays = days.slice(weekIndex * 7, (weekIndex + 1) * 7);
-          const maxEventsInWeek = Math.max(
-            ...weekDays.map(
-              (day) => getTodoCountForDay(day) + getEventCountForDay(day),
-            ),
-          );
-          const weekHeight =
-            maxEventsInWeek > 2 ? Math.min(maxEventsInWeek * 20, 100) : "auto";
-
-          return (
-            <div
-              key={weekIndex}
-              className="grid grid-cols-7 gap-1"
-              style={{ minHeight: "100px", height: weekHeight }}
-            >
-              {weekDays.map((day) => {
-                const todoCount = getTodoCountForDay(day);
-                const eventCount = getEventCountForDay(day);
-                const isSelected = isSameDay(day, selectedDate);
-                const isCurrentMonth = isSameMonth(day, currentMonth);
-                const dayItems = [
-                  ...todos.filter((todo) => isSameDay(todo.date, day)),
-                  ...events.filter(
-                    (event) => event.start && isSameDay(event.start, day),
-                  ),
-                ];
-
-                return (
-                  <motion.div
-                    key={day.toISOString()}
-                    className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${!isCurrentMonth
-                        ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
-                        : ""
-                      } ${getTaskIndicatorStyle(todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
-                    onClick={() => handleDateSelect(day)}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      e.currentTarget.classList.add(
-                        "bg-blue-100",
-                        "dark:bg-blue-800",
-                      );
-                    }}
-                    onDragLeave={(e) => {
-                      e.currentTarget.classList.remove(
-                        "bg-blue-100",
-                        "dark:bg-blue-800",
-                      );
-                    }}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      e.currentTarget.classList.remove(
-                        "bg-blue-100",
-                        "dark:bg-blue-800",
-                      );
-                      if (draggedStickyNote) {
-                        handleDateSelect(day);
-                        setIsEventModalOpen(true);
-                        deleteStickyNote(draggedStickyNote.id);
-                      }
-                    }}
-                  >
-                    <div className="text-right text-sm">{format(day, "d")}</div>
-                    {(todoCount > 0 || eventCount > 0) && (
-                      <div className="mt-1 space-y-1">
-                        {dayItems.slice(0, 2).map((item, index) => (
-                          <div
-                            key={index}
-                            className={`text-xs p-1 rounded ${"text" in item ? priorityColors[item.priority] : priorityColors[item.priority]}`}
-                          >
-                            {"text" in item ? item.text : item.title}
-                          </div>
-                        ))}
-                        {dayItems.length > 2 && (
-                          <div className="text-xs text-center font-bold">
-                            +{dayItems.length - 2} more
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })}
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
     setIsEventModalOpen(true);
@@ -377,7 +238,18 @@ export default function Home() {
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
-          {renderCalendar()}
+          <CalendarRenderer
+            todos={todos}
+            events={events}
+            stickyNotes={stickyNotes}
+            currentMonth={currentMonth}
+            selectedDate={selectedDate}
+            handleDateSelect={handleDateSelect}
+            isDarkMode={isDarkMode}
+            draggedStickyNote={draggedStickyNote}
+            deleteStickyNote={deleteStickyNote}
+            setIsEventModalOpen={setIsEventModalOpen}
+          />
         </div>
 
         <div className="w-full lg:w-1/2 pl-2 bg-white dark:bg-gray-800 overflow-auto lg:block hidden">
