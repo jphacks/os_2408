@@ -29,10 +29,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronUp,
-  Edit,
-  Trash2,
   X,
-  Brain,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -42,6 +39,7 @@ import { priorityColors } from "@/components/priority-colors";
 import { Navigation } from "@/components/navigation";
 import { EditWantodoDialog } from "@/components/edit-wantodo-dialog";
 import { CreateEventDialog } from "@/components/create-event-dialog";
+import { StickyNoteItem } from "@/components/sticky-note-item";
 
 export default function Home() {
   const [todos] = useState<Todo[]>([]);
@@ -338,59 +336,6 @@ export default function Home() {
     setIsEventModalOpen(true);
   };
 
-  const StickyNoteItem = ({ note }: { note: StickyNote }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
-      className="bg-yellow-200 dark:bg-yellow-700 p-4 rounded shadow-md"
-      draggable
-      onDragStart={(e) => {
-        setDraggedStickyNote(note);
-        const dragEvent = e as DragEvent;
-        if (dragEvent.dataTransfer) {
-          dragEvent.dataTransfer.effectAllowed = "move";
-          dragEvent.dataTransfer.setData("text/plain", note.id.toString());
-        }
-        if (e.currentTarget) {
-          (e.currentTarget as HTMLElement).style.opacity = "0.5";
-        }
-      }}
-      onDragEnd={(e) => {
-        setDraggedStickyNote(null);
-        if (e.currentTarget) {
-          (e.currentTarget as HTMLElement).style.opacity = "1";
-        }
-      }}
-    >
-      <h3 className="font-semibold mb-2">{note.title}</h3>
-      <div className="flex justify-end space-x-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => generateStickyNote(note)}
-        >
-          <Brain className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => editStickyNote(note)}
-        >
-          <Edit className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => deleteStickyNote(note.id)}
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </div>
-    </motion.div>
-  );
-
   const filteredStickyNotes = useMemo(() => {
     return stickyNotes.filter((note) =>
       note.title.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -463,7 +408,13 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <AnimatePresence>
               {filteredStickyNotes.map((note) => (
-                <StickyNoteItem key={note.id} note={note} />
+                <StickyNoteItem
+                  key={note.id} note={note}
+                  setDraggedStickyNote={setDraggedStickyNote}
+                  generateStickyNote={generateStickyNote}
+                  editStickyNote={editStickyNote}
+                  deleteStickyNote={deleteStickyNote}
+                />
               ))}
             </AnimatePresence>
           </div>
@@ -587,7 +538,13 @@ export default function Home() {
                   {filteredStickyNotes.length > 0 ? (
                     <div className="grid grid-cols-1 gap-4">
                       {filteredStickyNotes.map((note) => (
-                        <StickyNoteItem key={note.id} note={note} />
+                        <StickyNoteItem
+                          key={note.id} note={note}
+                          setDraggedStickyNote={setDraggedStickyNote}
+                          generateStickyNote={generateStickyNote}
+                          editStickyNote={editStickyNote}
+                          deleteStickyNote={deleteStickyNote}
+                        />
                       ))}
                     </div>
                   ) : (
