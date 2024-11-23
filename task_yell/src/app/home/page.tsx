@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { auth } from "@/firebase/client-app";
 import { createEvent, readEvents } from "@/lib/events";
 import { createNotification } from "@/lib/notifications";
@@ -17,21 +16,17 @@ import {
   subMonths,
 } from "date-fns";
 import { ja } from "date-fns/locale";
-import { AnimatePresence, motion, useDragControls } from "framer-motion";
 import {
   ChevronLeft,
   ChevronRight,
-  ChevronUp,
-  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { generateStickyNoteServer } from "./actions";
 import { Event, Todo, StickyNote } from "@/components/types";
 import { Navigation } from "@/components/navigation";
 import { EditWantodoDialog } from "@/components/edit-wantodo-dialog";
 import { CreateEventDialog } from "@/components/create-event-dialog";
-import { StickyNoteItem } from "@/components/sticky-note-item";
 import { CalendarRenderer } from "@/components/calendar-renderer";
 import { WantodoView } from "@/components/wantodo-view";
 
@@ -42,10 +37,6 @@ export default function Home() {
   const [newStickyNote, setNewStickyNote] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalState, setModalState] = useState<
-    "minimized" | "partial" | "full"
-  >("partial");
   const [searchTerm, setSearchTerm] = useState("");
   const [editingStickyNote, setEditingStickyNote] = useState<StickyNote | null>(
     null,
@@ -58,8 +49,6 @@ export default function Home() {
   const [removedStickyNote, setRemovedStickyNote] = useState<StickyNote | null>(
     null,
   );
-  const dragControls = useDragControls();
-  const modalRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -204,14 +193,6 @@ export default function Home() {
     );
   }, [stickyNotes, searchTerm]);
 
-  const handleStatusBarClick = () => {
-    setModalState((prevState) => {
-      if (prevState === "minimized") return "partial";
-      if (prevState === "partial") return "full";
-      return "partial";
-    });
-  };
-
   return (
     <div
       className={`relative h-screen bg-gray-100 dark:bg-gray-900 overflow-hidden ${isDarkMode ? "dark" : ""}`}
@@ -266,144 +247,6 @@ export default function Home() {
           />
         </div>
       </div>
-
-      <AnimatePresence>
-        {isModalOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{
-              opacity: modalState === "minimized" ? 0 : 1,
-            }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black flex items-end justify-center z-50 lg:hidden"
-            style={{
-              backgroundColor:
-                modalState === "minimized"
-                  ? "transparent"
-                  : "rgba(0, 0, 0, 0.5)",
-              pointerEvents: modalState === "minimized" ? "none" : "auto",
-            }}
-            onClick={(e) => {
-              if (e.target === e.currentTarget && modalState !== "minimized") {
-                setIsModalOpen(false);
-              }
-            }}
-          >
-            <motion.div
-              ref={modalRef}
-              initial={{ y: "100%" }}
-              animate={{
-                y:
-                  modalState === "minimized"
-                    ? "calc(100% - 40px)"
-                    : modalState === "partial"
-                      ? "calc(100% - 400px)"
-                      : "0%",
-                height:
-                  modalState === "full"
-                    ? "100%"
-                    : modalState === "partial"
-                      ? "400px"
-                      : "40px",
-                transition: {
-                  type: "spring",
-                  damping: 30,
-                  stiffness: 300,
-                },
-              }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 500 }}
-              drag="y"
-              dragControls={dragControls}
-              dragConstraints={{ top: 0, bottom: 0 }}
-              dragElastic={0.2}
-              onDragEnd={(_, info) => {
-                if (info.offset.y > 200) {
-                  setIsModalOpen(false);
-                } else if (info.offset.y < -20) {
-                  setModalState("full");
-                } else if (info.offset.y > 20 && info.offset.y <= 100) {
-                  setModalState("partial");
-                } else if (info.offset.y > 100) {
-                  setModalState("minimized");
-                }
-              }}
-              className="bg-white dark:bg-gray-800 w-full sm:w-96 md:w-[512px] rounded-t-xl shadow-lg overflow-hidden"
-              style={{
-                maxWidth: "calc(100% - 2rem)",
-                margin: "0 1rem",
-                height: modalState === "full" ? "calc(100% - 2rem)" : "auto",
-                maxHeight: "calc(100% - 2rem)",
-                zIndex: 60,
-              }}
-            >
-              <div
-                className="h-10 flex items-center justify-start cursor-pointer overflow-x-auto whitespace-nowrap px-4"
-                onClick={handleStatusBarClick}
-                onPointerDown={(e) => dragControls.start(e)}
-              >
-                <ChevronUp className="h-6 w-6 text-gray-400 flex-shrink-0" />
-                <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
-                  {format(selectedDate, "yyyy年MM月dd日", { locale: ja })}
-                  のwanTODO
-                </span>
-                {filteredStickyNotes.length > 0 && (
-                  <span className="ml-2 text-sm text-gray-600 dark:text-gray-300">
-                    （{filteredStickyNotes.length}件）
-                  </span>
-                )}
-              </div>
-              <div
-                className="p-4 overflow-y-auto"
-                style={{ maxHeight: "calc(100% - 40px)" }}
-              >
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold dark:text-white">
-                    {format(selectedDate, "yyyy年MM月dd日", { locale: ja })}
-                    のwanTODO
-                  </h3>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setIsModalOpen(false)}
-                  >
-                    <X className="h-6 w-6" />
-                  </Button>
-                </div>
-                <div className="space-y-4">
-                  <Input
-                    type="text"
-                    value={newStickyNote}
-                    onChange={(e) => setNewStickyNote(e.target.value)}
-                    placeholder="新しいwanTODOのタイトルを入力"
-                    className="w-full"
-                  />
-                  <Button onClick={addStickyNote} className="w-full">
-                    追加
-                  </Button>
-                  {filteredStickyNotes.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-4">
-                      {filteredStickyNotes.map((note) => (
-                        <StickyNoteItem
-                          key={note.id} note={note}
-                          setDraggedStickyNote={setDraggedStickyNote}
-                          generateStickyNote={generateStickyNote}
-                          editStickyNote={editStickyNote}
-                          deleteStickyNote={deleteStickyNote}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="dark:text-gray-300">
-                      この日のwanTODOはありません。
-                    </p>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       <EditWantodoDialog
         editingStickyNote={editingStickyNote}
