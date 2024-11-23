@@ -33,6 +33,7 @@ import { EditWantodoDialog } from "@/components/edit-wantodo-dialog";
 import { CreateEventDialog } from "@/components/create-event-dialog";
 import { StickyNoteItem } from "@/components/sticky-note-item";
 import { CalendarRenderer } from "@/components/calendar-renderer";
+import { WantodoView } from "@/components/wantodo-view";
 
 export default function Home() {
   const [todos] = useState<Todo[]>([]);
@@ -253,43 +254,16 @@ export default function Home() {
         </div>
 
         <div className="w-full lg:w-1/2 pl-2 bg-white dark:bg-gray-800 overflow-auto lg:block hidden">
-          <h2 className="text-xl lg:text-2xl font-bold mb-4 dark:text-white">
-            wanTODO
-          </h2>
-          <div className="flex flex-col lg:flex-row mb-4 space-y-2 lg:space-y-0 lg:space-x-2">
-            <Input
-              type="text"
-              value={newStickyNote}
-              onChange={(e) => setNewStickyNote(e.target.value)}
-              placeholder="タイトルを入力"
-              className="flex-grow"
-            />
-            <Button onClick={addStickyNote} className="w-full lg:w-auto">
-              追加
-            </Button>
-          </div>
-          <div className="mb-4">
-            <Input
-              type="text"
-              placeholder="wanTODOを検索..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full"
-            />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <AnimatePresence>
-              {filteredStickyNotes.map((note) => (
-                <StickyNoteItem
-                  key={note.id} note={note}
-                  setDraggedStickyNote={setDraggedStickyNote}
-                  generateStickyNote={generateStickyNote}
-                  editStickyNote={editStickyNote}
-                  deleteStickyNote={deleteStickyNote}
-                />
-              ))}
-            </AnimatePresence>
-          </div>
+          <WantodoView 
+            newStickyNote={newStickyNote} setNewStickyNote={setNewStickyNote}
+            addStickyNote={addStickyNote}
+            searchTerm={searchTerm} setSearchTerm={setSearchTerm}
+            filteredStickyNotes={filteredStickyNotes}
+            setDraggedStickyNote={setDraggedStickyNote}
+            generateStickyNote={generateStickyNote}
+            editStickyNote={editStickyNote}
+            deleteStickyNote={deleteStickyNote}
+          />
         </div>
       </div>
 
