@@ -1,12 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { auth } from "@/firebase/client-app";
 import { createEvent, readEvents } from "@/lib/events";
@@ -43,11 +37,11 @@ import {
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { generateStickyNoteServer } from "./actions";
-import { EventCreator } from "@/components/event-creator";
 import { Event, Todo, StickyNote } from "@/components/types";
 import { priorityColors } from "@/components/priority-colors";
 import { Navigation } from "@/components/navigation";
 import { EditWantodoDialog } from "@/components/edit-wantodo-dialog";
+import { CreateEventDialog } from "@/components/create-event-dialog";
 
 export default function Home() {
   const [todos] = useState<Todo[]>([]);
@@ -614,28 +608,18 @@ export default function Home() {
         updateStickyNote={updateStickyNote}
       />
 
-      <Dialog open={isEventModalOpen} onOpenChange={setIsEventModalOpen}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>
-              {format(selectedDate, "yyyy年MM月dd日", { locale: ja })}の予定
-            </DialogTitle>
-          </DialogHeader>
-          <EventCreator
-            events={events}
-            onSave={addEvent}
-            onCancel={() => {
-              if (removedStickyNote) {
-                setStickyNotes([...stickyNotes, removedStickyNote]);
-                setRemovedStickyNote(null);
-              }
-              setIsEventModalOpen(false);
-            }}
-            initialTitle={draggedStickyNote ? draggedStickyNote.title : ""}
-            targetDate={selectedDate}
-          />
-        </DialogContent>
-      </Dialog>
+      <CreateEventDialog 
+        stickyNotes={stickyNotes}
+        setStickyNotes={setStickyNotes}
+        isEventModalOpen={isEventModalOpen}
+        setIsEventModalOpen={setIsEventModalOpen}
+        selectedDate={selectedDate}
+        events={events}
+        addEvent={addEvent}
+        removedStickyNote={removedStickyNote}
+        setRemovedStickyNote={setRemovedStickyNote}
+        draggedStickyNote={draggedStickyNote}
+      />
     </div>
   );
 }
