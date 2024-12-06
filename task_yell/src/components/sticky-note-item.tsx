@@ -2,11 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import {
-  Edit,
-  Trash2,
-  Brain,
-} from "lucide-react";
+import { Edit, Trash2, Brain } from "lucide-react";
 import { StickyNote } from "@/components/types";
 
 type Props = {
@@ -15,14 +11,15 @@ type Props = {
   generateStickyNote: (note: StickyNote) => void;
   editStickyNote: (note: StickyNote) => void;
   deleteStickyNote: (id: string) => void;
-}
+};
 
 export function StickyNoteItem({
   note,
-  setDraggedStickyNote, generateStickyNote,
-  editStickyNote, deleteStickyNote
-}: Props
-) {
+  setDraggedStickyNote,
+  generateStickyNote,
+  editStickyNote,
+  deleteStickyNote,
+}: Props) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -74,5 +71,5 @@ export function StickyNoteItem({
         </Button>
       </div>
     </motion.div>
-  )
+  );
 }

@@ -14,9 +14,13 @@ type Props = {
   editingStickyNote: StickyNote | null;
   setEditingStickyNote: (stickyNote: StickyNote | null) => void;
   updateStickyNote: (stickyNote: StickyNote) => void;
-}
+};
 
-export function EditWantodoDialog({ editingStickyNote, setEditingStickyNote, updateStickyNote }: Props) {
+export function EditWantodoDialog({
+  editingStickyNote,
+  setEditingStickyNote,
+  updateStickyNote,
+}: Props) {
   return (
     <Dialog
       open={!!editingStickyNote}
@@ -50,5 +54,5 @@ export function EditWantodoDialog({ editingStickyNote, setEditingStickyNote, upd
         )}
       </DialogContent>
     </Dialog>
-  )
+  );
 }

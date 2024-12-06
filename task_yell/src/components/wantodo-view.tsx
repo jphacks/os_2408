@@ -17,19 +17,20 @@ type Props = {
   generateStickyNote: (note: StickyNote) => void;
   editStickyNote: (note: StickyNote) => void;
   deleteStickyNote: (id: string) => void;
-}
+};
 
 export function WantodoView({
-  newStickyNote, setNewStickyNote,
+  newStickyNote,
+  setNewStickyNote,
   addStickyNote,
-  searchTerm, setSearchTerm,
+  searchTerm,
+  setSearchTerm,
   filteredStickyNotes,
   setDraggedStickyNote,
   generateStickyNote,
   editStickyNote,
-  deleteStickyNote
-}: Props
-) {
+  deleteStickyNote,
+}: Props) {
   return (
     <>
       <h2 className="text-xl lg:text-2xl font-bold mb-4 dark:text-white">
@@ -60,7 +61,8 @@ export function WantodoView({
         <AnimatePresence>
           {filteredStickyNotes.map((note) => (
             <StickyNoteItem
-              key={note.id} note={note}
+              key={note.id}
+              note={note}
               setDraggedStickyNote={setDraggedStickyNote}
               generateStickyNote={generateStickyNote}
               editStickyNote={editStickyNote}
@@ -70,5 +72,5 @@ export function WantodoView({
         </AnimatePresence>
       </div>
     </>
-  )
+  );
 }
