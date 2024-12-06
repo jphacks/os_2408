@@ -21,16 +21,9 @@ import {
   Pencil1Icon,
   ViewGridIcon,
 } from "@radix-ui/react-icons";
-import {
-  format,
-  getHours,
-  isSameDay,
-} from "date-fns";
+import { format, getHours, isSameDay } from "date-fns";
 import { ja } from "date-fns/locale";
-import {
-  MapPinIcon,
-  UserPlusIcon,
-} from "lucide-react";
+import { MapPinIcon, UserPlusIcon } from "lucide-react";
 import { useState } from "react";
 import { Event } from "@/components/types";
 import { priorityColors } from "./priority-colors";
@@ -79,7 +72,6 @@ export function EventCreator({
     isLocked: z.boolean(),
   });
 
-
   const handleSave = () => {
     if (targetDate) {
       const newEvent: Event = {
@@ -95,12 +87,12 @@ export function EventCreator({
         isTask,
         isLocked,
       };
-        // バリデーションの実行
-    const result = eventSchema.safeParse(newEvent);
-    if (!result.success) {
-      alert(result.error.errors.map((err) => err.message).join("\n"));
-      return;
-    }
+      // バリデーションの実行
+      const result = eventSchema.safeParse(newEvent);
+      if (!result.success) {
+        alert(result.error.errors.map((err) => err.message).join("\n"));
+        return;
+      }
       onSave(newEvent, { date: notificationDate, type: notificationType });
     }
   };

@@ -25,7 +25,7 @@ type Props = {
   draggedStickyNote: StickyNote | null;
   deleteStickyNote: (id: string) => void;
   setIsEventModalOpen: (isOpen: boolean) => void;
-}
+};
 
 function getDaysInMonth(date: Date) {
   const start = startOfWeek(startOfMonth(date), { weekStartsOn: 0 });
@@ -42,7 +42,11 @@ function getEventCountForDay(events: Event[], day: Date) {
     .length;
 }
 
-function getTaskIndicatorStyle(isDarkMode: boolean, todoCount: number, eventCount: number) {
+function getTaskIndicatorStyle(
+  isDarkMode: boolean,
+  todoCount: number,
+  eventCount: number,
+) {
   const count = todoCount + eventCount;
   if (count === 0) return "";
   const baseColor = isDarkMode ? "bg-red-" : "bg-red-";
@@ -52,13 +56,16 @@ function getTaskIndicatorStyle(isDarkMode: boolean, todoCount: number, eventCoun
 }
 
 export function CalendarRenderer({
-  todos, events,
-  currentMonth, selectedDate, handleDateSelect,
+  todos,
+  events,
+  currentMonth,
+  selectedDate,
+  handleDateSelect,
   isDarkMode,
-  draggedStickyNote, deleteStickyNote,
-  setIsEventModalOpen
-}: Props
-) {
+  draggedStickyNote,
+  deleteStickyNote,
+  setIsEventModalOpen,
+}: Props) {
   const days = getDaysInMonth(currentMonth);
   const weeks = Math.ceil(days.length / 7);
 
@@ -78,7 +85,8 @@ export function CalendarRenderer({
         const weekDays = days.slice(weekIndex * 7, (weekIndex + 1) * 7);
         const maxEventsInWeek = Math.max(
           ...weekDays.map(
-            (day) => getTodoCountForDay(todos, day) + getEventCountForDay(events, day),
+            (day) =>
+              getTodoCountForDay(todos, day) + getEventCountForDay(events, day),
           ),
         );
         const weekHeight =
@@ -105,10 +113,11 @@ export function CalendarRenderer({
               return (
                 <motion.div
                   key={day.toISOString()}
-                  className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${!isCurrentMonth
-                    ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
-                    : ""
-                    } ${getTaskIndicatorStyle(isDarkMode, todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
+                  className={`p-1 border rounded-md cursor-pointer transition-all duration-300 overflow-hidden ${isSelected ? "border-blue-300 dark:border-blue-600" : ""} ${
+                    !isCurrentMonth
+                      ? "text-gray-400 dark:text-gray-600 bg-gray-100 dark:bg-gray-700"
+                      : ""
+                  } ${getTaskIndicatorStyle(isDarkMode, todoCount, eventCount)} hover:bg-gray-100 dark:hover:bg-gray-700`}
                   onClick={() => handleDateSelect(day)}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -164,4 +173,4 @@ export function CalendarRenderer({
       })}
     </div>
   );
-};
+}

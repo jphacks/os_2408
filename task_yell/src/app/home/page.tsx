@@ -10,16 +10,9 @@ import {
   readWantTodos,
   updateWantTodo,
 } from "@/lib/want-todo";
-import {
-  addMonths,
-  format,
-  subMonths,
-} from "date-fns";
+import { addMonths, format, subMonths } from "date-fns";
 import { ja } from "date-fns/locale";
-import {
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { generateStickyNoteServer } from "./actions";
@@ -157,7 +150,7 @@ export default function Home() {
     newEvent: Event,
     notification: { date: Date | null; type: "call" | "push" },
   ) => {
-    console.log("addEvent",newEvent);
+    console.log("addEvent", newEvent);
     setEvents([...events, newEvent]);
     setIsEventModalOpen(false);
     setRemovedStickyNote(null);
@@ -236,10 +229,12 @@ export default function Home() {
         </div>
 
         <div className="w-full lg:w-1/2 pl-2 bg-white dark:bg-gray-800 overflow-auto lg:block hidden">
-          <WantodoView 
-            newStickyNote={newStickyNote} setNewStickyNote={setNewStickyNote}
+          <WantodoView
+            newStickyNote={newStickyNote}
+            setNewStickyNote={setNewStickyNote}
             addStickyNote={addStickyNote}
-            searchTerm={searchTerm} setSearchTerm={setSearchTerm}
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
             filteredStickyNotes={filteredStickyNotes}
             setDraggedStickyNote={setDraggedStickyNote}
             generateStickyNote={generateStickyNote}
@@ -255,7 +250,7 @@ export default function Home() {
         updateStickyNote={updateStickyNote}
       />
 
-      <CreateEventDialog 
+      <CreateEventDialog
         stickyNotes={stickyNotes}
         setStickyNotes={setStickyNotes}
         isEventModalOpen={isEventModalOpen}
