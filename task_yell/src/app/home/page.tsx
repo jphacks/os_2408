@@ -157,6 +157,7 @@ export default function Home() {
     newEvent: Event,
     notification: { date: Date | null; type: "call" | "push" },
   ) => {
+    console.log("addEvent",newEvent);
     setEvents([...events, newEvent]);
     setIsEventModalOpen(false);
     setRemovedStickyNote(null);

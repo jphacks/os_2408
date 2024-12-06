@@ -1,5 +1,6 @@
 "use client";
 
+import { z } from "zod";
 import { DateTimeInput } from "@/components/date-time-input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -64,6 +65,20 @@ export function EventCreator({
   const [notificationType, setNotificationType] = useState<"call" | "push">(
     "call",
   );
+  // Zod スキーマの定義
+  const eventSchema = z.object({
+    title: z.string().nonempty("タイトルは空白にできません。"),
+    start: z.date(),
+    end: z.date(),
+    description: z.string().optional(),
+    category: z.string().optional(),
+    priority: z.string().optional(),
+    location: z.string().optional(),
+    invitees: z.array(z.string()).optional(),
+    isTask: z.boolean(),
+    isLocked: z.boolean(),
+  });
+
 
   const handleSave = () => {
     if (targetDate) {
@@ -80,6 +95,12 @@ export function EventCreator({
         isTask,
         isLocked,
       };
+        // バリデーションの実行
+    const result = eventSchema.safeParse(newEvent);
+    if (!result.success) {
+      alert(result.error.errors.map((err) => err.message).join("\n"));
+      return;
+    }
       onSave(newEvent, { date: notificationDate, type: notificationType });
     }
   };
