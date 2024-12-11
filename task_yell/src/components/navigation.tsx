@@ -15,21 +15,14 @@ import { signOut } from "@/firebase/auth";
 import { auth, db } from "@/firebase/client-app";
 import { subscribeNotification } from "@/lib/push-notification";
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
-import {
-  Menu,
-  Bell,
-  Users,
-  Download,
-  LogOut,
-  PhoneCall,
-} from "lucide-react";
+import { Menu, Bell, Users, Download, LogOut, PhoneCall } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 type Props = {
   isDarkMode: boolean;
   setIsDarkMode: (isDarkMode: boolean) => void;
-}
+};
 
 export function Navigation({ isDarkMode, setIsDarkMode }: Props) {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,42 +30,45 @@ export function Navigation({ isDarkMode, setIsDarkMode }: Props) {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const router = useRouter();
 
-  const menuItems = useMemo(() => [
-    {
-      icon: PhoneCall,
-      label: "電話通知",
-      onClick: () => {
-        return setIsNotificationsOpen(!isNotificationsOpen);
+  const menuItems = useMemo(
+    () => [
+      {
+        icon: PhoneCall,
+        label: "電話通知",
+        onClick: () => {
+          return setIsNotificationsOpen(!isNotificationsOpen);
+        },
       },
-    },
-    {
-      icon: Bell,
-      label: "プッシュ通知",
-      onClick: async () => {
-        await subscribeNotification();
+      {
+        icon: Bell,
+        label: "プッシュ通知",
+        onClick: async () => {
+          await subscribeNotification();
+        },
       },
-    },
-    { icon: Users, label: "友達", onClick: () => console.log("友達") },
-    {
-      icon: Download,
-      label: "インポート",
-      onClick: () => {
-        if (auth.currentUser) {
-          router.push(
-            `/api/auth/google-cal?userId=${encodeURIComponent(auth.currentUser.uid)}`,
-          );
-        }
+      { icon: Users, label: "友達", onClick: () => console.log("友達") },
+      {
+        icon: Download,
+        label: "インポート",
+        onClick: () => {
+          if (auth.currentUser) {
+            router.push(
+              `/api/auth/google-cal?userId=${encodeURIComponent(auth.currentUser.uid)}`,
+            );
+          }
+        },
       },
-    },
-    {
-      icon: LogOut,
-      label: "ログアウト",
-      onClick: async () => {
-        await signOut();
-        router.refresh();
+      {
+        icon: LogOut,
+        label: "ログアウト",
+        onClick: async () => {
+          await signOut();
+          router.refresh();
+        },
       },
-    },
-  ], [isNotificationsOpen, router]);
+    ],
+    [isNotificationsOpen, router],
+  );
 
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -157,5 +153,5 @@ export function Navigation({ isDarkMode, setIsDarkMode }: Props) {
         </nav>
       </SheetContent>
     </Sheet>
-  )
+  );
 }

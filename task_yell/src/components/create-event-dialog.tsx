@@ -6,9 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  format,
-} from "date-fns";
+import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { EventCreator } from "@/components/event-creator";
 import { Event, StickyNote } from "@/components/types";
@@ -20,18 +18,25 @@ type Props = {
   setIsEventModalOpen: (isOpen: boolean) => void;
   selectedDate: Date;
   events: Event[];
-  addEvent: (newEvent: Event, notification: { date: Date | null; type: "call" | "push" }) => void;
+  addEvent: (
+    newEvent: Event,
+    notification: { date: Date | null; type: "call" | "push" },
+  ) => void;
   removedStickyNote: StickyNote | null;
   setRemovedStickyNote: (note: StickyNote | null) => void;
   draggedStickyNote: StickyNote | null;
 };
 
 export function CreateEventDialog({
-  stickyNotes, setStickyNotes,
-  isEventModalOpen, setIsEventModalOpen,
+  stickyNotes,
+  setStickyNotes,
+  isEventModalOpen,
+  setIsEventModalOpen,
   selectedDate,
-  events, addEvent,
-  removedStickyNote, setRemovedStickyNote,
+  events,
+  addEvent,
+  removedStickyNote,
+  setRemovedStickyNote,
   draggedStickyNote,
 }: Props) {
   return (
@@ -57,5 +62,5 @@ export function CreateEventDialog({
         />
       </DialogContent>
     </Dialog>
-  )
+  );
 }
